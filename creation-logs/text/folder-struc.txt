@@ -1,0 +1,22 @@
+📁 Folder Structure Manual Checklist
+
+pulsebreak/
+    README.md
+    .gitignore
+    run.sh 
+    run.bat 
+
+    Backend/
+        __init__.py (empty file)
+        main.py
+        functions.py
+        config.py
+        requirements.txt
+
+    Frontend/
+        src/
+        tauri.conf.json
+    
+    Data/
+        settings.json
+        logs.json

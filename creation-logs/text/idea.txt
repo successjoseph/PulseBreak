@@ -1,0 +1,163 @@
+🧠 Project Brief: PulseBreak
+
+📝 1. Project Overview
+
+PulseBreak is a cross-platform desktop application designed to improve health, focus, and accountability for individuals who spend extended periods working or studying in front of screens.
+
+The app provides timely reminders, integrates voice-based affirmation checks, and includes intelligent Focus Mode and AFK detection to ensure that productivity and well-being are balanced seamlessly throughout the day.
+
+------------------------------------------------------------------------------------
+
+🎯 2. Problem Statement
+
+Many digital workers and students experience:
+
+i. Eye strain and physical fatigue from prolonged screen exposure
+ii. Forgetfulness around taking breaks or hydrating
+iii. Decreased mental resilience due to lack of regular positive reinforcement
+iv. Poor adherence to break reminders due to intrusive or simplistic tools
+v. Existing reminder applications are often either too passive (easy to ignore) or too aggressive (disruptive), with little accountability or adaptability to real-world work patterns.
+
+------------------------------------------------------------------------------------
+
+💡 3. Proposed Solution
+
+PulseBreak introduces a smart break and affirmation system that adapts to the user’s activity, focuses on gentle but consistent reminders, and uses voice confirmation to make sure affirmations are actually spoken.
+
+The system includes manual Focus Mode, AFK detection, and system sleep awareness, ensuring reminders occur only at the right times — not during inactivity or intense work sessions.
+
+------------------------------------------------------------------------------------
+
+✨ 4. Core Features
+
+a. ⏰ Scheduled Break Reminders
+
+b. Customizable intervals (default: 20 minutes)
+
+c. Notifications for:
+
+    i. 20-20-20 Eye Rule
+    ii. Hydration reminders
+    iii. Standing & Stretching breaks
+    iv. Delivered through native system notifications or subtle popups
+
+d. 🗣 Mandatory Affirmations:
+
+    i. Occur every 2 hours, regardless of Focus Mode status
+    ii. Use microphone to confirm user has spoken, without storing audio
+    iii. Non-compliance triggers gentle reminders
+    iv. Logged for daily accountability
+
+e. 🔴 Focus Mode:
+
+    i. Activated manually through a floating always-on-top toggle box
+    ii. Pauses all regular reminders while active
+    iii. Affirmations continue to occur as scheduled
+
+f. 💤 AFK Detection:
+    i. Triggered after 5 minutes of no keyboard or mouse activity
+    ii. All reminders (including affirmations) pause while AFK
+
+g. If the system enters sleep mode:
+
+    i. Focus Mode is automatically turned off
+    ii. Schedules pause gracefully
+    iii. On wake or activity resumption, reminders continue seamlessly
+
+h. 🖥 Tray Integration & UI:
+
+    i. Minimal system tray app
+    ii. Floating focus toggle box for quick access
+    iii. Settings and logs accessible via a clean Tauri-based UI
+    iv. No intrusive overlays or unnecessary windows
+
+i. 📝 Logs & Summaries:
+    i. Tracks affirmation completion and skips, as well as reminders skipped due to Focus Mode
+    ii. Keeps daily logs for 7 days
+    iii. Automatically generates a weekly summary (averages and completion rates) at the end of each 7-day cycle
+    iv. Deletes old daily logs after summarizing to keep storage lean
+
+------------------------------------------------------------------------------------
+
+🧱 5. Technical Architecture
+
+Component (Technology):	Purpose
+
+Backend	(Python): Scheduling, AFK detection, mic checks, notifications
+Scheduler (APScheduler):  Non-blocking recurring jobs
+Notifications (Plyer / OS APIs): Cross-platform notification delivery
+Voice Detection (vosk (local STT), pyaudio): Lightweight speech activity detection
+AFK Detection (pyautogui / OS hooks): Detect inactivity and sleep events
+Frontend (Tauri (Rust + HTML/JS)): Lightweight UI, tray integration, cross-platform support
+Storage (JSON (MVP), SQLite (later)): Store settings and logs locally
+Logging (JSON): Lightweight tracking of affirmation/reminder activity, summarized weekly
+
+------------------------------------------------------------------------------------
+
+📁 6. Project Structure
+pulsebreak/
+├── backend/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── functions.py
+│   ├── config.py
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   └── tauri.conf.json
+├── data/
+│   ├── settings.json
+│   ├── logs.json
+│   └── summary.json
+|
+├── run.sh / run.bat
+├── README.md
+└── .gitignore
+
+------------------------------------------------------------------------------------
+
+🛠 7. Development Timeline
+
+Phase	Goal	Deliverables
+
+Project Setup	Folder structure, virtual environment, Tauri initialization
+Backend MVP	Scheduler, notifications, AFK detection, affirmation mic check
+Frontend MVP	Tauri UI, floating focus toggle
+Integration	Frontend–backend communication, tray menu, persistent settings
+Polish & Stretch Goals	Themes, stats dashboard, animations, QA & bug fixes
+
+Estimated MVP Completion: ~2 weeks
+
+------------------------------------------------------------------------------------
+
+🌟 8. Value Proposition
+
+Encourages healthy screen habits without being intrusive
+
+Reinforces positive mindset through real spoken affirmations
+
+Adapts intelligently to user behavior (Focus Mode & AFK detection)
+
+Lightweight, privacy-respecting, and fully local — no external servers
+
+Clean and minimal UX suitable for both students and professionals
+
+------------------------------------------------------------------------------------
+
+🧭 9. Future Opportunities
+
+Calendar and Pomodoro integration
+
+Cloud sync of settings and logs
+
+Custom affirmation libraries
+
+Team/enterprise mode with usage dashboards
+
+------------------------------------------------------------------------------------
+
+📝 Conclusion
+
+PulseBreak blends health, focus, and technology into a single, adaptive desktop companion. Through scheduled micro-breaks, mandatory spoken affirmations, and intelligent detection of user state, it encourages sustainable productivity without disrupting workflow.
+
+This project leverages a simple but robust stack, making it ideal for solo development, future scalability, and cross-platform deployment.
