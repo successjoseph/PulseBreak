@@ -1,163 +1,169 @@
-🧠 Project Brief: PulseBreak
-
+🧠 Project Brief: PulseBreak (v2 - Mod)
 📝 1. Project Overview
 
-PulseBreak is a cross-platform desktop application designed to improve health, focus, and accountability for individuals who spend extended periods working or studying in front of screens.
+PulseBreak is a cross-platform desktop application designed to improve health, focus, and accountability. It intelligently monitors user-selected "work applications" to provide context-aware reminders.
 
-The app provides timely reminders, integrates voice-based affirmation checks, and includes intelligent Focus Mode and AFK detection to ensure that productivity and well-being are balanced seamlessly throughout the day.
-
-------------------------------------------------------------------------------------
+The app is built around a system of Customizable User Modes (e.g., "At Work," "Studying," "Intense Focus"), each with its own unique set of reminders and actions. It features a minimal floating bubble UI for quick mode-switching and delivers actionable, screen-covering notifications (or subtle audio cues, depending on the mode) to ensure health and productivity are balanced.
 
 🎯 2. Problem Statement
 
 Many digital workers and students experience:
 
-i. Eye strain and physical fatigue from prolonged screen exposure
-ii. Forgetfulness around taking breaks or hydrating
-iii. Decreased mental resilience due to lack of regular positive reinforcement
-iv. Poor adherence to break reminders due to intrusive or simplistic tools
-v. Existing reminder applications are often either too passive (easy to ignore) or too aggressive (disruptive), with little accountability or adaptability to real-world work patterns.
-
-------------------------------------------------------------------------------------
+i. Eye strain and physical fatigue from prolonged screen exposure. ii. Forgetfulness around taking breaks or hydrating during focused work. iii. Decreased mental resilience due to a lack of positive reinforcement. iv. "Reminder Blindness": Existing tools are too passive and easily ignored. v. "Disruptive Reminders": Other tools are too aggressive, interrupting critical workflows (like a presentation or "flow state") with the wrong kind of alert. vi. Lack of Context: Tools don't differentiate between "deep work," "casual browsing," or "being in a meeting," treating all screen time identically.
 
 💡 3. Proposed Solution
 
-PulseBreak introduces a smart break and affirmation system that adapts to the user’s activity, focuses on gentle but consistent reminders, and uses voice confirmation to make sure affirmations are actually spoken.
+PulseBreak introduces a Mode-Based Wellness System that is triggered by Application Monitoring.
 
-The system includes manual Focus Mode, AFK detection, and system sleep awareness, ensuring reminders occur only at the right times — not during inactivity or intense work sessions.
+The user defines which applications (e.g., VS Code, Chrome, Word) count as "work." When these apps are active, PulseBreak runs the reminder schedule for the currently selected Mode.
 
-------------------------------------------------------------------------------------
+Each Mode (e.g., "At Home," "Intense Focus," "In a Library") is fully customizable, allowing the user to define which reminders (posture, eye breaks, water) are active, how often they occur, and how they are delivered (e.g., a 70% screen popup, a gentle audio cue).
 
 ✨ 4. Core Features
 
-a. ⏰ Scheduled Break Reminders
+a. 🖥️ Application Monitoring:
 
-b. Customizable intervals (default: 20 minutes)
+User selects a list of "work applications" that will trigger PulseBreak's active state.
 
-c. Notifications for:
+Reminders only run when one of these designated applications is in the foreground.
 
-    i. 20-20-20 Eye Rule
-    ii. Hydration reminders
-    iii. Standing & Stretching breaks
-    iv. Delivered through native system notifications or subtle popups
+b. 🎛️ Customizable User Modes:
 
-d. 🗣 Mandatory Affirmations:
+Users can create and customize multiple modes (e.g., "At Home," "On Transit," "At Work," "Studying," "Intense Focus").
 
-    i. Occur every 2 hours, regardless of Focus Mode status
-    ii. Use microphone to confirm user has spoken, without storing audio
-    iii. Non-compliance triggers gentle reminders
-    iv. Logged for daily accountability
+Each mode has its own settings for:
 
-e. 🔴 Focus Mode:
+Active reminders (e.g., 20-20-20 rule, hydration, stretching, affirmations).
 
-    i. Activated manually through a floating always-on-top toggle box
-    ii. Pauses all regular reminders while active
-    iii. Affirmations continue to occur as scheduled
+Reminder frequency.
 
-f. 💤 AFK Detection:
-    i. Triggered after 5 minutes of no keyboard or mouse activity
-    ii. All reminders (including affirmations) pause while AFK
+Reminder delivery method (see below).
 
-g. If the system enters sleep mode:
+c. 🔊 Reminder Delivery System:
 
-    i. Focus Mode is automatically turned off
-    ii. Schedules pause gracefully
-    iii. On wake or activity resumption, reminders continue seamlessly
+Standard (Popup): A large, semi-transparent popup that covers 70% of the screen, requiring dismissal or completion of the task (e.g., the affirmation). This is the default for most reminders.
 
-h. 🖥 Tray Integration & UI:
+Intense Focus (Audio): For modes like "Intense Focus," reminders are delivered as audio-only cues (e.g., a "posture" reminder) with no screen popup.
 
-    i. Minimal system tray app
-    ii. Floating focus toggle box for quick access
-    iii. Settings and logs accessible via a clean Tauri-based UI
-    iv. No intrusive overlays or unnecessary windows
+Mandatory Affirmations: Occur at their own interval (e.g., every 2 hours). Uses microphone confirmation. Delivery (popup vs. audio) is dependent on the active Mode.
 
-i. 📝 Logs & Summaries:
-    i. Tracks affirmation completion and skips, as well as reminders skipped due to Focus Mode
-    ii. Keeps daily logs for 7 days
-    iii. Automatically generates a weekly summary (averages and completion rates) at the end of each 7-day cycle
-    iv. Deletes old daily logs after summarizing to keep storage lean
+d. 🔵 Floating UI & Side Tray:
 
-------------------------------------------------------------------------------------
+A floating, always-on-top bubble is visible when the app is active.
+
+Clicking the bubble expands it into a small side tray (similar to a phone's volume control).
+
+This tray allows for instant switching between User Modes.
+
+e. 💤 AFK & Sleep Detection:
+
+Triggered after 5 minutes of no keyboard or mouse activity.
+
+All reminders and tracking pause while AFK or if the system sleeps.
+
+Schedules resume seamlessly on activity.
+
+f. 📝 Logs & Summaries:
+
+Tracks affirmation completion, skips, and reminders delivered.
+
+Logs are categorized by Mode to see patterns (e.g., "Skipped 5 reminders while 'At Work'").
+
+Generates a weekly summary of adherence and activity.
+
+g. 🛠️ Heavy Customization:
+
+The core philosophy: almost everything is customizable.
+
+Users can define modes, edit reminders, change frequencies, and select app triggers.
 
 🧱 5. Technical Architecture
 
-Component (Technology):	Purpose
+Component (Technology): Purpose
 
-Backend	(Python): Scheduling, AFK detection, mic checks, notifications
-Scheduler (APScheduler):  Non-blocking recurring jobs
-Notifications (Plyer / OS APIs): Cross-platform notification delivery
-Voice Detection (vosk (local STT), pyaudio): Lightweight speech activity detection
-AFK Detection (pyautogui / OS hooks): Detect inactivity and sleep events
-Frontend (Tauri (Rust + HTML/JS)): Lightweight UI, tray integration, cross-platform support
-Storage (JSON (MVP), SQLite (later)): Store settings and logs locally
-Logging (JSON): Lightweight tracking of affirmation/reminder activity, summarized weekly
+Backend (Python):
 
-------------------------------------------------------------------------------------
+Scheduling (APScheduler): Non-blocking recurring jobs for active modes.
 
-📁 6. Project Structure
-pulsebreak/
-├── backend/
-│   ├── __init__.py
-│   ├── main.py
-│   ├── functions.py
-│   ├── config.py
-│   └── requirements.txt
-├── frontend/
-│   ├── src/
-│   └── tauri.conf.json
-├── data/
-│   ├── settings.json
-│   ├── logs.json
-│   └── summary.json
-|
-├── run.sh / run.bat
-├── README.md
-└── .gitignore
+Active Window Detection (pywin32 (Win), OS-specific APIs (Mac/Linux)): [New Challenge] Detects the foreground application to match against the user's "work app" list.
 
-------------------------------------------------------------------------------------
+AFK Detection (pyautogui / OS hooks): Detect inactivity and sleep events.
 
-🛠 7. Development Timeline
+Voice Detection (vosk, pyaudio): Lightweight, local speech activity detection.
 
-Phase	Goal	Deliverables
+Notifications (Tauri API / Plyer): Deliver audio cues. The 70% popup will be a borderless Tauri window.
 
-Project Setup	Folder structure, virtual environment, Tauri initialization
-Backend MVP	Scheduler, notifications, AFK detection, affirmation mic check
-Frontend MVP	Tauri UI, floating focus toggle
-Integration	Frontend–backend communication, tray menu, persistent settings
-Polish & Stretch Goals	Themes, stats dashboard, animations, QA & bug fixes
+Frontend (Tauri (Rust + HTML/JS)):
 
-Estimated MVP Completion: ~2 weeks
+Main UI: Settings, mode creation, logs, app selection.
 
-------------------------------------------------------------------------------------
+Floating Bubble: A small, transparent, always-on-top Tauri webview window.
+
+Side Tray: The "expanded" state of the bubble window.
+
+Popup Window: A large, borderless, semi-transparent Tauri window spawned for intrusive reminders.
+
+Storage (JSON / SQLite):
+
+settings.json: Stores app list, mode definitions, and preferences.
+
+logs.json: Daily activity logs.
+
+🛠 7. Development Timeline (Revised)
+
+Phase | Goal | Deliverables --- | --- | --- Project Setup | Folder structure, dependencies. | Project skeleton created. Backend MVP | Core logic for modes and detection. | 1. Active Window Detection (to check for "work apps").
+
+
+2. AFK detection.
+
+
+3. Basic Mode logic (loading settings for a selected mode).
+
+
+4. Scheduler that triggers placeholder reminders. Frontend MVP | The core UI/UX. | 1. Floating Bubble (always-on-top).
+
+
+2. Side Tray that expands from bubble to switch modes.
+
+
+3. Basic settings page to define a mode. Integration | Connect front and back ends. | 1. Bubble UI successfully tells backend which mode is active.
+
+
+2. Backend scheduler triggers reminders based on the active mode.
+
+
+3. Create the 70% (Tauri window) popup. Core Features | Add affirmations and audio. | 1. Integrate mic check for affirmations.
+
+
+2. Implement audio-only reminders for "Intense Focus" mode. Polish | Logging, persistence, and QA. | 1. Implement logging. <B> 2. Build weekly summary.
+
+
+3. Bug fixes.
+
+Estimated MVP Completion: ~3-4 weeks (Note: The Active Window Detection is more complex than the original MVP).
 
 🌟 8. Value Proposition
 
-Encourages healthy screen habits without being intrusive
+Truly Adaptive: Encourages healthy habits by adapting to the user's context and workflow, not just a simple timer.
 
-Reinforces positive mindset through real spoken affirmations
+Actionable Alerts: Overcomes "reminder blindness" with clear, configurable popups that demand attention when needed.
 
-Adapts intelligently to user behavior (Focus Mode & AFK detection)
+Protects Flow State: Allows users to define "Intense Focus" modes that protect deep work with subtle, non-visual cues.
 
-Lightweight, privacy-respecting, and fully local — no external servers
+Reinforces Mindset: Uses real, spoken affirmations to build mental resilience.
 
-Clean and minimal UX suitable for both students and professionals
-
-------------------------------------------------------------------------------------
+Lightweight & Private: Fully local, no external servers.
 
 🧭 9. Future Opportunities
 
-Calendar and Pomodoro integration
+Calendar and Pomodoro integration (a "Pomodoro" could be a special "Mode").
 
-Cloud sync of settings and logs
+Cloud sync of settings and modes.
 
-Custom affirmation libraries
+Custom affirmation and audio libraries.
 
-Team/enterprise mode with usage dashboards
-
-------------------------------------------------------------------------------------
+Team/enterprise mode with usage dashboards.
 
 📝 Conclusion
 
-PulseBreak blends health, focus, and technology into a single, adaptive desktop companion. Through scheduled micro-breaks, mandatory spoken affirmations, and intelligent detection of user state, it encourages sustainable productivity without disrupting workflow.
-
-This project leverages a simple but robust stack, making it ideal for solo development, future scalability, and cross-platform deployment.
+PulseBreak (v2) evolves into a highly personal and intelligent wellness companion. By understanding what the user is doing (via app monitoring) and how they want to work (via modes), it delivers the right intervention at the right time, balancing productivity and well-being.

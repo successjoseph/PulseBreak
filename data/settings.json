@@ -1,0 +1,200 @@
+{
+    "version": "0.3.0",
+    "first_run_timestamp": "2025-10-27T20:00:00.000000",
+    "system_info": {
+        "platform": "win32",
+        "os": "Windows",
+        "os_release": "10",
+        "os_version": "10.0.19045",
+        "architecture": "AMD64",
+        "python_version": "3.11.0",
+        "username": "pulsebreak_user"
+    },
+    "active_mode_id": "mode_001",
+    "global_settings": {
+        "run_on_startup": false,
+        "enable_logging": true,
+        "theme": "system",
+        "afk_threshold_sec": 300
+    },
+    "reminder_library": {
+        "eye_break": {
+            "name": "20-20-20 Eye Rule",
+            "popup_message": "Time for an eye break!\nLook at something 20 feet (6m) away for 20 seconds.",
+            "audio_cue": "chime.wav",
+            "duration_sec": 20
+        },
+        "hydration": {
+            "name": "Hydration",
+            "popup_message": "Quick break!\nTime to drink some water and stay hydrated.",
+            "audio_cue": "water_drop.wav",
+            "duration_sec": 5
+        },
+        "stretch": {
+            "name": "Move & Stretch",
+            "popup_message": "Stand up, stretch your legs, and roll your shoulders.\nGet the blood flowing!",
+            "audio_cue": "stretch_bell.wav",
+            "duration_sec": 10
+        },
+        "posture": {
+            "name": "Posture Check",
+            "popup_message": "Posture Check!\nAre you sitting up straight? Shoulders back.",
+            "audio_cue": "posture_ping.wav",
+            "duration_sec": 5
+        },
+        "affirmation": {
+            "name": "Mandatory Affirmation",
+            "popup_message": "Time for your affirmation.\nTake a deep breath and speak your affirmation aloud.",
+            "audio_cue": "affirmation_bell.wav",
+            "duration_sec": 10
+        }
+    },
+    "affirmation_library": [
+        "I am focused and productive.",
+        "I value my health and well-being.",
+        "I am capable of solving complex problems.",
+        "I choose to be positive and grateful.",
+        "My work makes a difference."
+    ],
+    "modes": [
+        {
+            "id": "mode_001",
+            "name": "At Work (Default)",
+            "is_default": true,
+            "reminders": {
+                "eye_break": {
+                    "enabled": true,
+                    "interval_min": 2,
+                    "delivery": "popup"
+                },
+                "hydration": {
+                    "enabled": true,
+                    "interval_min": 5,
+                    "delivery": "popup"
+                },
+                "stretch": {
+                    "enabled": true,
+                    "interval_min": 11,
+                    "delivery": "popup"
+                },
+                "posture": {
+                    "enabled": false,
+                    "interval_min": 13,
+                    "delivery": "audio"
+                },
+                "affirmation": {
+                    "enabled": true,
+                    "interval_min": 19,
+                    "delivery": "popup"
+                }
+            }
+        },
+        {
+            "id": "mode_002",
+            "name": "Intense Focus",
+            "is_default": false,
+            "reminders": {
+                "eye_break": {
+                    "enabled": false,
+                    "interval_min": 20,
+                    "delivery": "popup"
+                },
+                "hydration": {
+                    "enabled": true,
+                    "interval_min": 45,
+                    "delivery": "audio"
+                },
+                "stretch": {
+                    "enabled": false,
+                    "interval_min": 90,
+                    "delivery": "popup"
+                },
+                "posture": {
+                    "enabled": true,
+                    "interval_min": 15,
+                    "delivery": "audio"
+                },
+                "affirmation": {
+                    "enabled": true,
+                    "interval_min": 120,
+                    "delivery": "audio"
+                }
+            }
+        },
+        {
+            "id": "mode_003",
+            "name": "In a Library (Silent)",
+            "is_default": false,
+            "reminders": {
+                "eye_break": {
+                    "enabled": true,
+                    "interval_min": 30,
+                    "delivery": "audio"
+                },
+                "hydration": {
+                    "enabled": true,
+                    "interval_min": 60,
+                    "delivery": "audio"
+                },
+                "stretch": {
+                    "enabled": false,
+                    "interval_min": 90,
+                    "delivery": "audio"
+                },
+                "posture": {
+                    "enabled": true,
+                    "interval_min": 30,
+                    "delivery": "audio"
+                },
+                "affirmation": {
+                    "enabled": false,
+                    "interval_min": 120,
+                    "delivery": "audio"
+                }
+            }
+        },
+        {
+            "id": "mode_1b031f",
+            "name": "jjj",
+            "is_default": false,
+            "reminders": {
+                "eye_break": {
+                    "enabled": true,
+                    "interval_min": 20,
+                    "delivery": "popup"
+                },
+                "hydration": {
+                    "enabled": true,
+                    "interval_min": 60,
+                    "delivery": "popup"
+                },
+                "stretch": {
+                    "enabled": true,
+                    "interval_min": 90,
+                    "delivery": "popup"
+                },
+                "posture": {
+                    "enabled": false,
+                    "interval_min": 30,
+                    "delivery": "audio"
+                },
+                "affirmation": {
+                    "enabled": true,
+                    "interval_min": 120,
+                    "delivery": "popup"
+                }
+            }
+        }
+    ],
+    "work_apps": [
+        "adb.exe",
+        "chrome.exe",
+        "Code.exe",
+        "java.exe",
+        "Notepad.exe",
+        "powershell.exe",
+        "pycharm64.exe",
+        "python3.11.exe",
+        "WindowsTerminal.exe"
+    ]
+}
