@@ -64,27 +64,27 @@
             "reminders": {
                 "eye_break": {
                     "enabled": true,
-                    "interval_min": 2,
+                    "interval_min": 20,
                     "delivery": "popup"
                 },
                 "hydration": {
                     "enabled": true,
-                    "interval_min": 5,
+                    "interval_min": 60,
                     "delivery": "popup"
                 },
                 "stretch": {
                     "enabled": true,
-                    "interval_min": 11,
+                    "interval_min": 90,
                     "delivery": "popup"
                 },
                 "posture": {
                     "enabled": false,
-                    "interval_min": 13,
+                    "interval_min": 30,
                     "delivery": "audio"
                 },
                 "affirmation": {
                     "enabled": true,
-                    "interval_min": 19,
+                    "interval_min": 120,
                     "delivery": "popup"
                 }
             }
@@ -150,38 +150,6 @@
                     "enabled": false,
                     "interval_min": 120,
                     "delivery": "audio"
-                }
-            }
-        },
-        {
-            "id": "mode_1b031f",
-            "name": "jjj",
-            "is_default": false,
-            "reminders": {
-                "eye_break": {
-                    "enabled": true,
-                    "interval_min": 20,
-                    "delivery": "popup"
-                },
-                "hydration": {
-                    "enabled": true,
-                    "interval_min": 60,
-                    "delivery": "popup"
-                },
-                "stretch": {
-                    "enabled": true,
-                    "interval_min": 90,
-                    "delivery": "popup"
-                },
-                "posture": {
-                    "enabled": false,
-                    "interval_min": 30,
-                    "delivery": "audio"
-                },
-                "affirmation": {
-                    "enabled": true,
-                    "interval_min": 120,
-                    "delivery": "popup"
                 }
             }
         }

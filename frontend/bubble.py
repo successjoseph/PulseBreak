@@ -173,7 +173,7 @@ class PopupWidget(QWidget):
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
         # 1. Dark background (90% opacity)
-        bg_color = QColor(31, 41, 55, int(255 * 0.9)) # dark-gray-800
+        bg_color = QColor(31, 41, 55, int(255)) # dark-gray-800
         painter.setBrush(bg_color)
         painter.setPen(Qt.PenStyle.NoPen)
         # Use float rect for potentially smoother rounded corners
@@ -249,7 +249,7 @@ class SettingsPopup(QWidget):
         self.main_frame.setObjectName("mainFrame")
         self.main_frame.setStyleSheet("""
             #mainFrame {
-                background-color: #FFFFFF; /* White background */
+                background-color: #1F2937;
                 border-radius: 10px;
                 border: 1px solid #E5E7EB; /* Light border */
             }
@@ -269,8 +269,8 @@ class SettingsPopup(QWidget):
         self.close_button.setFixedSize(24, 24)
         self.close_button.setStyleSheet("""
             QPushButton { background-color: transparent; border: none; font-size: 16px;
-                          color: #6B7280; padding: 0; margin: 0; }
-            QPushButton:hover { color: #111827; }
+                          color: #F97316; padding: 0; margin: 0; }
+            QPushButton:hover { color: #F97316; }
         """)
         self.close_button.clicked.connect(self.close)
 
@@ -285,7 +285,7 @@ class SettingsPopup(QWidget):
         # --- 1. Navigation Sidebar ---
         self.nav_widget = QWidget(); self.nav_widget.setObjectName("sidebar")
         self.nav_widget.setFixedWidth(200)
-        self.nav_widget.setStyleSheet("#sidebar { background-color: #ffffff; border-right: 1px solid #E5E7EB; border-top-left-radius: 10px; border-bottom-left-radius: 10px; }")
+        self.nav_widget.setStyleSheet("#sidebar { background-color: #1F2937; border-right: 1px solid #E5E7EB; border-top-left-radius: 10px; border-bottom-left-radius: 10px; }")
         self.nav_layout = QVBoxLayout(self.nav_widget)
         self.nav_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.nav_layout.setContentsMargins(0, 10, 0, 10)
@@ -297,7 +297,7 @@ class SettingsPopup(QWidget):
         self.nav_list.setStyleSheet("""
             QListWidget { border: none; background-color: transparent; }
             QListWidget::item { padding: 10px 15px; }
-            QListWidget::item:selected { background-color: #EFF6FF; color: #1D4ED8; font-weight: bold; border-left: 3px solid #3B82F6; }
+            QListWidget::item:selected { background-color: #EFF6FF; color: #F97316; font-weight: bold; border-left: 3px solid #3B82F6; }
         """)
         self.nav_layout.addWidget(self.nav_list)
 
@@ -403,10 +403,10 @@ class SettingsPopup(QWidget):
         # Add "Add New Mode" button
         add_mode_button = QPushButton(" + Add New Mode")
         add_mode_button.setStyleSheet("""
-            QPushButton { background-color: #E0E7FF; color: #3730A3; border: none;
+            QPushButton { background-color: #E0E7FF; color: #F97316; border: none;
                           padding: 8px 12px; border-radius: 6px; font-weight: 600;
                           margin-bottom: 15px; text-align: left; }
-            QPushButton:hover { background-color: #C7D2FE; }
+            QPushButton:hover { background-color: #1F2937; }
         """)
         add_mode_button.clicked.connect(self.add_new_mode)
         # Insert button *before* the stretch in the content layout
@@ -427,7 +427,7 @@ class SettingsPopup(QWidget):
                 widget = item.widget()
                 # Don't remove the Add button
                 if not isinstance(widget, QPushButton):
-                    widget.deleteLater()
+                    widget.deleteLater() #type: ignore
             # Check if it's a spacer item before accessing spacerItem
             elif item is not None and item.spacerItem() is not None:
                  # Keep the stretch spacer at the end
@@ -449,7 +449,7 @@ class SettingsPopup(QWidget):
             mode_widget.setObjectName(f"card_{mode_id}") # Unique object name
             mode_widget.setFrameShape(QFrame.Shape.StyledPanel)
             mode_widget.setStyleSheet("""
-                QFrame { background-color: #ffffff; border: 1px solid #E5E7EB;
+                QFrame { background-color: #1F2937; border: 1px solid #E5E7EB;
                          border-radius: 5px; padding: 10px; margin-bottom: 10px; }
             """)
             mode_layout = QGridLayout(mode_widget)
@@ -758,10 +758,10 @@ class BubbleWidget(QWidget):
         self.bubble.setFixedSize(56, 56)
         self.bubble.setStyleSheet("""
             QPushButton {
-                background-color: white; border: 1px solid #E0E0E0;
-                border-radius: 28px; font-size: 28px; color: #3B82F6;
+                background-color: #1F2937; border: 1px solid #E0E0E0;
+                border-radius: 28px; font-size: 28px; color: #F97316;
             }
-            QPushButton:hover { background-color: #F3F4F6; }
+            QPushButton:hover { background-color: #F97316; }
         """)
         self.bubble.clicked.connect(self.toggle_tray)
         shadow = QGraphicsDropShadowEffect(self)
@@ -775,7 +775,7 @@ class BubbleWidget(QWidget):
         self.tray.setMaximumHeight(0) # Start hidden
         self.tray.setStyleSheet("""
             QFrame {
-                background-color: #F9FAFB; /* Light Gray Background */
+                background-color: #1F2937; 
                 border-radius: 8px; border: 1px solid #E5E7EB;
             }
         """)
@@ -797,14 +797,14 @@ class BubbleWidget(QWidget):
         title = QLabel("Select Mode")
         title.setStyleSheet("""
             QLabel { font-size: 14px; font-weight: 600; padding: 8px;
-                     border-bottom: 1px solid #E5E7EB; color: #1F2937; }
+                     border-bottom: 1px solid #E5E7EB; #F97316; }
         """)
         self.tray_layout.addWidget(title)
 
         self.mode_list = QListWidget()
         self.mode_list.setStyleSheet("""
             QListWidget { border: none; background-color: transparent; }
-            QListWidget::item { padding: 10px 12px; color: #374151; } /* Adjusted padding */
+            QListWidget::item { padding: 10px 12px; color: #F97316; }
             QListWidget::item:hover { background-color: #F3F4F6; }
             QListWidget::item:selected { background-color: #EFF6FF; color: #1D4ED8; font-weight: 600; }
         """)
