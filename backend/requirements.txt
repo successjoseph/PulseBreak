@@ -1,0 +1,6 @@
+PyQt6==6.6.0
+PyQt6-QtMultimedia==6.6.0
+PyQt6-QtTextToSpeech==6.6.0
+apscheduler==3.10.4
+psutil==5.9.8
+pywin32==306
