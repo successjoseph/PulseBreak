@@ -1,0 +1,138 @@
+{
+    "themes": [
+        {
+            "id": "theme_obsidian_01",
+            "name": "Obsidian",
+            "author": "PulseBreak Team",
+            "colors": {
+                "background": "#1F2937",
+                "surface": "#374151",
+                "primary": "#F97316",
+                "secondary": "#E5E7EB",
+                "text_primary": "#FFFFFF",
+                "text_secondary": "#E5E7EB",
+                "text_accent": "#F97316",
+                "border": "#4B5563",
+                "hover_bg": "#4B5563",
+                "selected_bg": "#4B5563",
+                "selected_text": "#F97316",
+                "success": "#22C55E"
+            }
+        },
+        {
+            "id": "theme_graphite_02",
+            "name": "Graphite",
+            "author": "PulseBreak Team",
+            "colors": {
+                "background": "#222222",
+                "surface": "#333333",
+                "primary": "#4A90E2",
+                "secondary": "#AAAAAA",
+                "text_primary": "#F5F5F5",
+                "text_secondary": "#BBBBBB",
+                "text_accent": "#4A90E2",
+                "border": "#444444",
+                "hover_bg": "#444444",
+                "selected_bg": "#4A90E2",
+                "selected_text": "#FFFFFF",
+                "success": "#22C55E"
+            }
+        },
+        {
+            "id": "theme_terminal_03",
+            "name": "Terminal",
+            "author": "PulseBreak Team",
+            "colors": {
+                "background": "#000000",
+                "surface": "#1A1A1A",
+                "primary": "#39FF14",
+                "secondary": "#808080",
+                "text_primary": "#39FF14",
+                "text_secondary": "#CCCCCC",
+                "text_accent": "#39FF14",
+                "border": "#333333",
+                "hover_bg": "#222222",
+                "selected_bg": "#39FF14",
+                "selected_text": "#000000",
+                "success": "#39FF14"
+            }
+        },
+        {
+            "id": "theme_coffee_04",
+            "name": "Coffee House",
+            "author": "Community",
+            "colors": {
+                "background": "#432818",
+                "surface": "#5E3023",
+                "primary": "#FFC971",
+                "secondary": "#99582A",
+                "text_primary": "#FFFFFF",
+                "text_secondary": "#E0CDB6",
+                "text_accent": "#FFC971",
+                "border": "#774936",
+                "hover_bg": "#774936",
+                "selected_bg": "#FFC971",
+                "selected_text": "#432818",
+                "success": "#A3B18A"
+            }
+        },
+        {
+            "id": "theme_zen_05",
+            "name": "Zen Garden",
+            "author": "PulseBreak Team",
+            "colors": {
+                "background": "#F0FDF4",
+                "surface": "#FFFFFF",
+                "primary": "#22C55E",
+                "secondary": "#A3A3A3",
+                "text_primary": "#1F2937",
+                "text_secondary": "#4B5563",
+                "text_accent": "#16A34A",
+                "border": "#E5E7EB",
+                "hover_bg": "#F3F4F6",
+                "selected_bg": "#DCFCE7",
+                "selected_text": "#16A34A",
+                "success": "#22C55E"
+            }
+        },
+        {
+            "id": "theme_ocean_06",
+            "name": "Ocean Deep",
+            "author": "Community",
+            "colors": {
+                "background": "#0A2F51",
+                "surface": "#0E4D64",
+                "primary": "#25A18E",
+                "secondary": "#7AE582",
+                "text_primary": "#FFFFFF",
+                "text_secondary": "#97C8EB",
+                "text_accent": "#7AE582",
+                "border": "#0E4D64",
+                "hover_bg": "#126E82",
+                "selected_bg": "#25A18E",
+                "selected_text": "#FFFFFF",
+                "success": "#7AE582"
+            }
+        },
+        {
+            "id": "theme_sunrise_07",
+            "name": "Sunrise",
+            "author": "Community",
+            "colors": {
+                "background": "#FFF7F7",
+                "surface": "#FFFFFF",
+                "primary": "#F97316",
+                "secondary": "#FCA5A5",
+                "text_primary": "#444152",
+                "text_secondary": "#5E5A72",
+                "text_accent": "#F97316",
+                "border": "#FECACA",
+                "hover_bg": "#FEE2E2",
+                "selected_bg": "#FEE2E2",
+                "selected_text": "#F97316",
+                "success": "#22C55E"
+            }
+        }
+    ]
+}
+

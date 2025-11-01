@@ -10,17 +10,18 @@
         "python_version": "3.11.0",
         "username": "pulsebreak_user"
     },
-    "active_mode_id": "mode_001",
+    "active_mode_id": "mode_d0fba7",
     "global_settings": {
-        "run_on_startup": false,
-        "enable_logging": true,
+        "run_on_startup": true,
+        "enable_logging": false,
         "theme": "system",
-        "afk_threshold_sec": 300
+        "afk_threshold_sec": 300,
+        "active_theme_id": "theme_terminal_03"
     },
     "reminder_library": {
         "eye_break": {
-            "name": "20-20-20 Eye Rule",
-            "popup_message": "Time for an eye break!\nLook at something 20 feet (6m) away for 20 seconds.",
+            "name": "20 20 20 Eye Rule",
+            "popup_message": "Time for an eye break!\nLook at something 20 feet away for 20 seconds.",
             "audio_cue": "chime.wav",
             "duration_sec": 20
         },
@@ -28,7 +29,7 @@
             "name": "Hydration",
             "popup_message": "Quick break!\nTime to drink some water and stay hydrated.",
             "audio_cue": "water_drop.wav",
-            "duration_sec": 5
+            "duration_sec": 10
         },
         "stretch": {
             "name": "Move & Stretch",
@@ -38,13 +39,13 @@
         },
         "posture": {
             "name": "Posture Check",
-            "popup_message": "Posture Check!\nAre you sitting up straight? Shoulders back.",
+            "popup_message": "It's time for your Posture Check!\nAre you sitting up straight? Shoulders back?.",
             "audio_cue": "posture_ping.wav",
             "duration_sec": 5
         },
         "affirmation": {
-            "name": "Mandatory Affirmation",
-            "popup_message": "Time for your affirmation.\nTake a deep breath and speak your affirmation aloud.",
+            "name": "Positive Affirmation",
+            "popup_message": "Time for your Positive Affirmations.\nTake a deep breath and speak your affirmation aloud.",
             "audio_cue": "affirmation_bell.wav",
             "duration_sec": 10
         }
@@ -54,7 +55,7 @@
         "I value my health and well-being.",
         "I am capable of solving complex problems.",
         "I choose to be positive and grateful.",
-        "My work makes a difference."
+        "My work makes a difference"
     ],
     "modes": [
         {
@@ -65,27 +66,32 @@
                 "eye_break": {
                     "enabled": true,
                     "interval_min": 20,
-                    "delivery": "popup"
+                    "delivery": "popup",
+                    "duration_sec": 10
                 },
                 "hydration": {
                     "enabled": true,
-                    "interval_min": 60,
-                    "delivery": "popup"
+                    "interval_min": 70,
+                    "delivery": "popup",
+                    "duration_sec": 10
                 },
                 "stretch": {
                     "enabled": true,
-                    "interval_min": 90,
-                    "delivery": "popup"
+                    "interval_min": 110,
+                    "delivery": "popup",
+                    "duration_sec": 10
                 },
                 "posture": {
-                    "enabled": false,
-                    "interval_min": 30,
-                    "delivery": "audio"
+                    "enabled": true,
+                    "interval_min": 50,
+                    "delivery": "audio",
+                    "duration_sec": 10
                 },
                 "affirmation": {
                     "enabled": true,
                     "interval_min": 120,
-                    "delivery": "popup"
+                    "delivery": "popup",
+                    "duration_sec": 10
                 }
             }
         },
@@ -97,27 +103,32 @@
                 "eye_break": {
                     "enabled": false,
                     "interval_min": 20,
-                    "delivery": "popup"
+                    "delivery": "popup",
+                    "duration_sec": 10
                 },
                 "hydration": {
                     "enabled": true,
-                    "interval_min": 45,
-                    "delivery": "audio"
+                    "interval_min": 60,
+                    "delivery": "audio",
+                    "duration_sec": 10
                 },
                 "stretch": {
                     "enabled": false,
                     "interval_min": 90,
-                    "delivery": "popup"
+                    "delivery": "popup",
+                    "duration_sec": 10
                 },
                 "posture": {
-                    "enabled": true,
+                    "enabled": false,
                     "interval_min": 15,
-                    "delivery": "audio"
+                    "delivery": "audio",
+                    "duration_sec": 10
                 },
                 "affirmation": {
-                    "enabled": true,
+                    "enabled": false,
                     "interval_min": 120,
-                    "delivery": "audio"
+                    "delivery": "audio",
+                    "duration_sec": 10
                 }
             }
         },
@@ -129,27 +140,143 @@
                 "eye_break": {
                     "enabled": true,
                     "interval_min": 30,
-                    "delivery": "audio"
+                    "delivery": "audio",
+                    "duration_sec": 10
                 },
                 "hydration": {
                     "enabled": true,
                     "interval_min": 60,
-                    "delivery": "audio"
+                    "delivery": "audio",
+                    "duration_sec": 10
                 },
                 "stretch": {
                     "enabled": false,
                     "interval_min": 90,
-                    "delivery": "audio"
+                    "delivery": "audio",
+                    "duration_sec": 10
                 },
                 "posture": {
                     "enabled": true,
                     "interval_min": 30,
-                    "delivery": "audio"
+                    "delivery": "audio",
+                    "duration_sec": 10
                 },
                 "affirmation": {
                     "enabled": false,
                     "interval_min": 120,
-                    "delivery": "audio"
+                    "delivery": "audio",
+                    "duration_sec": 10
+                }
+            }
+        },
+        {
+            "id": "mode_c507c9",
+            "name": "Coding",
+            "is_default": false,
+            "reminders": {
+                "eye_break": {
+                    "enabled": true,
+                    "interval_min": 20,
+                    "delivery": "popup",
+                    "duration_sec": 10
+                },
+                "hydration": {
+                    "enabled": true,
+                    "interval_min": 60,
+                    "delivery": "popup",
+                    "duration_sec": 10
+                },
+                "stretch": {
+                    "enabled": true,
+                    "interval_min": 90,
+                    "delivery": "popup",
+                    "duration_sec": 10
+                },
+                "posture": {
+                    "enabled": true,
+                    "interval_min": 30,
+                    "delivery": "audio",
+                    "duration_sec": 10
+                },
+                "affirmation": {
+                    "enabled": true,
+                    "interval_min": 120,
+                    "delivery": "popup",
+                    "duration_sec": 10
+                }
+            }
+        },
+        {
+            "id": "mode_0b8f9f",
+            "name": "Reading",
+            "is_default": false,
+            "reminders": {
+                "eye_break": {
+                    "enabled": true,
+                    "interval_min": 20,
+                    "delivery": "popup",
+                    "duration_sec": 10
+                },
+                "hydration": {
+                    "enabled": true,
+                    "interval_min": 60,
+                    "delivery": "popup",
+                    "duration_sec": 10
+                },
+                "stretch": {
+                    "enabled": true,
+                    "interval_min": 90,
+                    "delivery": "popup",
+                    "duration_sec": 10
+                },
+                "posture": {
+                    "enabled": true,
+                    "interval_min": 45,
+                    "delivery": "audio",
+                    "duration_sec": 10
+                },
+                "affirmation": {
+                    "enabled": true,
+                    "interval_min": 120,
+                    "delivery": "popup",
+                    "duration_sec": 10
+                }
+            }
+        },
+        {
+            "id": "mode_d0fba7",
+            "name": "Testing",
+            "is_default": false,
+            "reminders": {
+                "eye_break": {
+                    "enabled": false,
+                    "interval_min": 1,
+                    "delivery": "popup",
+                    "duration_sec": 10
+                },
+                "hydration": {
+                    "enabled": false,
+                    "interval_min": 1,
+                    "delivery": "popup",
+                    "duration_sec": 10
+                },
+                "stretch": {
+                    "enabled": false,
+                    "interval_min": 1,
+                    "delivery": "popup",
+                    "duration_sec": 10
+                },
+                "posture": {
+                    "enabled": false,
+                    "interval_min": 1,
+                    "delivery": "audio",
+                    "duration_sec": 10
+                },
+                "affirmation": {
+                    "enabled": false,
+                    "interval_min": 1,
+                    "delivery": "audio",
+                    "duration_sec": 10
                 }
             }
         }

@@ -5,70 +5,78 @@ import platform
 import getpass
 from datetime import datetime
 
-# --- Constants ---
-VERSION = "0.3.0" # v5 features
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(BASE_DIR, 'data')
+# --- +++ NEW: Path Configuration +++ ---
+# Get the absolute path to the directory where run.py is (one level up from this file)
+# This makes all paths reliable whether running from .py or .exe
+# __file__ is config.py -> dirname is backend/ -> dirname is PulseBreak/
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(ROOT_DIR, 'data')
 SETTINGS_FILE = os.path.join(DATA_DIR, 'settings.json')
 LABELS_FILE = os.path.join(DATA_DIR, 'labeller.json')
+THEMES_FILE = os.path.join(DATA_DIR, 'themes.json') # New themes file
+# --- +++ END Path Configuration +++ ---
 
+
+# --- Constants ---
+VERSION = "0.3.0" # Version bump for theme support
 
 # --- Default Settings Structure ---
 DEFAULT_SETTINGS = {
     "version": VERSION,
     "first_run_timestamp": None,
     "system_info": {},
-    "active_mode_id": "mode_001", # Tracks the last used mode
     
     # --- Global Settings ---
     "global_settings": {
         "run_on_startup": False,
         "enable_logging": True,
-        "theme": "system", # 'system', 'light', 'dark'
+        "active_theme_id": "theme_obsidian_01", # <--- NEW: Last used theme
         "afk_threshold_sec": 300 # 5 minutes
     },
     
     # --- Reminder Library ---
-    # FIX: Added duration_sec for each reminder
+    # Defines the default *content* for each reminder.
     "reminder_library": {
         "eye_break": {
             "name": "20-20-20 Eye Rule",
             "popup_message": "Time for an eye break!\nLook at something 20 feet (6m) away for 20 seconds.",
             "audio_cue": "chime.wav",
-            "duration_sec": 20
+            "default_duration_sec": 20
         },
         "hydration": {
             "name": "Hydration",
             "popup_message": "Quick break!\nTime to drink some water and stay hydrated.",
             "audio_cue": "water_drop.wav",
-            "duration_sec": 5
+            "default_duration_sec": 10
         },
         "stretch": {
             "name": "Move & Stretch",
             "popup_message": "Stand up, stretch your legs, and roll your shoulders.\nGet the blood flowing!",
             "audio_cue": "stretch_bell.wav",
-            "duration_sec": 10
+            "default_duration_sec": 15
         },
         "posture": {
             "name": "Posture Check",
             "popup_message": "Posture Check!\nAre you sitting up straight? Shoulders back.",
             "audio_cue": "posture_ping.wav",
-            "duration_sec": 5
+            "default_duration_sec": 5
         },
         "affirmation": {
             "name": "Mandatory Affirmation",
             "popup_message": "Time for your affirmation.\nTake a deep breath and speak your affirmation aloud.",
             "audio_cue": "affirmation_bell.wav",
-            "duration_sec": 10
+            "default_duration_sec": 15
         }
     },
     
     # --- Affirmation Library ---
     "affirmation_library": [
         "I am focused and productive.",
+        "I am calm and in control of my day.",
         "I value my health and well-being.",
+        "Each break I take makes me more effective.",
         "I am capable of solving complex problems.",
-        "I choose to be positive and grateful.",
+        "I am creating positive habits.",
         "My work makes a difference."
     ],
 
@@ -79,12 +87,12 @@ DEFAULT_SETTINGS = {
             "name": "At Work (Default)",
             "is_default": True,
             "reminders": {
-                # Reminder key (from library) | enabled | interval | delivery (popup/audio)
-                "eye_break":   { "enabled": True, "interval_min": 20, "delivery": "popup" },
-                "hydration":   { "enabled": True, "interval_min": 60, "delivery": "popup" },
-                "stretch":     { "enabled": True, "interval_min": 90, "delivery": "popup" },
-                "posture":     { "enabled": False, "interval_min": 30, "delivery": "audio" },
-                "affirmation": { "enabled": True, "interval_min": 120, "delivery": "popup" }
+                # Reminder key | enabled | interval | delivery | duration
+                "eye_break":   { "enabled": True, "interval_min": 20, "delivery": "popup", "duration_sec": 20 },
+                "hydration":   { "enabled": True, "interval_min": 60, "delivery": "popup", "duration_sec": 10 },
+                "stretch":     { "enabled": True, "interval_min": 90, "delivery": "popup", "duration_sec": 15 },
+                "posture":     { "enabled": False, "interval_min": 30, "delivery": "audio", "duration_sec": 5 },
+                "affirmation": { "enabled": True, "interval_min": 120, "delivery": "popup", "duration_sec": 15 }
             }
         },
         {
@@ -92,34 +100,13 @@ DEFAULT_SETTINGS = {
             "name": "Intense Focus",
             "is_default": False,
             "reminders": {
-                "eye_break":   { "enabled": False, "interval_min": 20, "delivery": "popup" },
-                "hydration":   { "enabled": True, "interval_min": 45, "delivery": "audio" },
-                "stretch":     { "enabled": False, "interval_min": 90, "delivery": "popup" },
-                "posture":     { "enabled": True, "interval_min": 15, "delivery": "audio" },
-                "affirmation": { "enabled": True, "interval_min": 120, "delivery": "audio" }
-            }
-        },
-        {
-            "id": "mode_003",
-            "name": "In a Library (Silent)",
-            "is_default": False,
-            "reminders": {
-                "eye_break":   { "enabled": True, "interval_min": 30, "delivery": "audio" },
-                "hydration":   { "enabled": True, "interval_min": 60, "delivery": "audio" },
-                "stretch":     { "enabled": False, "interval_min": 90, "delivery": "audio" },
-                "posture":     { "enabled": True, "interval_min": 30, "delivery": "audio" },
-                "affirmation": { "enabled": False, "interval_min": 120, "delivery": "audio" }
+                "eye_break":   { "enabled": False, "interval_min": 20, "delivery": "popup", "duration_sec": 20 },
+                "hydration":   { "enabled": True, "interval_min": 45, "delivery": "audio", "duration_sec": 10 },
+                "stretch":     { "enabled": False, "interval_min": 90, "delivery": "popup", "duration_sec": 15 },
+                "posture":     { "enabled": True, "interval_min": 15, "delivery": "audio", "duration_sec": 5 },
+                "affirmation": { "enabled": True, "interval_min": 120, "delivery": "audio", "duration_sec": 15 }
             }
         }
-    ],
-    
-    # --- Work Apps List ---
-    # This is just a fallback. It will be overridden by labeller.json
-    "work_apps": [
-        "code.exe",
-        "pycharm64.exe",
-        "chrome.exe",
-        "powershell.exe"
     ]
 }
 
@@ -153,8 +140,8 @@ def load_settings():
     try:
         with open(SETTINGS_FILE, 'r') as f:
             settings_data = json.load(f)
-            print(f"Loaded settings from {SETTINGS_FILE}")
             # TODO: Add a migration check here if settings_data['version'] < VERSION
+            print(f"Loaded settings from {SETTINGS_FILE}")
             return settings_data
             
     except FileNotFoundError:
@@ -196,29 +183,30 @@ def load_labelled_apps():
             print(f"Loaded {len(work_apps)} work apps from {LABELS_FILE}")
             return work_apps
     except FileNotFoundError:
-        print(f"No {LABELS_FILE} found. Using 'work_apps' list from settings.json.")
-        return None # Return None to signify no override
+        print(f"No {LABELS_FILE} found. No 'work apps' will be tracked.")
+        return []
     except json.JSONDecodeError:
         print(f"Error reading {LABELS_FILE}. File might be corrupt.")
-        return None
+        return []
 
 # --- Main Exported Settings ---
+# This is the single object the rest of our app will import.
 # 1. Load the main settings from settings.json
 settings = load_settings()
 
 # 2. Load the work apps from labeller.json
-# FIX: This implements the sync you requested
-labelled_apps = load_labelled_apps()
-if labelled_apps is not None:
-    settings['work_apps'] = labelled_apps # Override the list
+# 3. Inject the work apps list into the main settings object
+#    This ensures it's always up-to-date on startup.
+settings['work_apps'] = load_labelled_apps() 
 
 # --- Self-Test ---
 if __name__ == "__main__":
     print("--- PulseBreak Configuration Loaded ---")
     print(f"Version: {settings.get('version')}")
     print(f"User: {settings.get('system_info', {}).get('username')}")
-    print(f"Theme: {settings.get('global_settings', {}).get('theme')}")
-    print(f"Tracking {len(settings.get('work_apps', []))} work apps:")
-    print(settings.get('work_apps'))
+    print(f"Theme: {settings.get('global_settings', {}).get('active_theme_id')}")
+    print(f"Tracking {len(settings.get('work_apps', []))} work apps.")
     print(f"Loaded {len(settings.get('modes', []))} modes.")
-    print(f"Active Mode ID: {settings.get('active_mode_id')}")
+    print(f"Settings file path: {SETTINGS_FILE}")
+    print(f"Themes file path: {THEMES_FILE}")
+

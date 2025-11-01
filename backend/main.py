@@ -22,11 +22,13 @@ except ImportError:
 # We create a simple QObject to hold our signals.
 # This allows main.py to send signals to run.py
 class EngineSignals(QObject):
-    # FIX: Add 'int' for the duration
     # Signal(title, message, type, duration_sec)
     show_popup = pyqtSignal(str, str, str, int)
     # Signal(str) -> (sound_file_name)
     play_audio = pyqtSignal(str)
+    # --- NEW: Signal for Text-to-Speech ---
+    # Signal(title, message)
+    speak_text = pyqtSignal(str, str)
 
 # --- Main Engine Class ---
 class PulseBreakEngine(QObject):
@@ -71,18 +73,18 @@ class PulseBreakEngine(QObject):
         delivery_type = reminder_settings.get("delivery", "popup")
 
         # --- Call the appropriate function ---
-        # FIX: Now returns duration
         title, message, audio_cue, duration_sec = fn.get_reminder_content(reminder_id)
         
+        # --- UPDATED DELIVERY LOGIC ---
         if delivery_type == "popup":
-            # EMIT a signal instead of printing
-            # FIX: Use dot notation and send all 4 args
+            # Send signal for popup
             self.app_state["signals"].show_popup.emit(title, message, "popup", duration_sec)
+            # ALSO send signal to play the chime
+            self.app_state["signals"].play_audio.emit(audio_cue)
         
         elif delivery_type == "audio":
-            # EMIT a signal to play audio
-            # FIX: Use dot notation
-            self.app_state["signals"].play_audio.emit(audio_cue)
+            # NEW: Send signal to speak the text
+            self.app_state["signals"].speak_text.emit(title, message)
 
 
     def update_reminder_jobs(self):
@@ -174,12 +176,20 @@ class PulseBreakEngine(QObject):
         """
         SLOT: Called from the UI to change the active mode.
         """
+        # Check if mode exists. If not, (e.g., it was just deleted), find a fallback.
+        modes = config.settings.get("modes", [])
+        if not any(m['id'] == mode_id for m in modes):
+            print(f"[Engine] Mode {mode_id} not found. Switching to default.")
+            default_mode = next((m for m in modes if m.get('is_default')), modes[0])
+            mode_id = default_mode['id']
+
         if mode_id == self.app_state['current_mode_id']:
-            return # No change
+            print("[Engine] Mode change requested, but already active. Reloading jobs.")
+            # Still reload jobs, in case settings changed
+        else:
+            print(f"[Engine] Changing mode to {mode_id}")
+            self.app_state['current_mode_id'] = mode_id
             
-        print(f"[Engine] Changing mode to {mode_id}")
-        self.app_state['current_mode_id'] = mode_id
-        
         # Save this change to config
         config.settings['active_mode_id'] = mode_id # Update in memory
         config.save_settings(config.settings)      # Save to file
@@ -196,6 +206,10 @@ class PulseBreakEngine(QObject):
         # Get default mode from config
         default_mode_id = "mode_001" # Fallback
         modes = config.settings.get("modes", [])
+        if not modes:
+             print("[Engine] CRITICAL: No modes found in settings. Exiting.")
+             return
+             
         for mode in modes:
             if mode.get("is_default"):
                 default_mode_id = mode.get("id")
