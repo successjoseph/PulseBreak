@@ -72,7 +72,7 @@ def get_reminder_content(reminder_id):
     audio_cue = lib_item.get("audio_cue", "chime.wav")
     
     # --- FIX: Return all 4 values ---
-    duration_sec = lib_item.get("duration_sec", 5) # Default to 5 seconds
+    #duration_sec = lib_item.get("duration_sec", 5) # Default to 5 seconds
 
     # If it's an affirmation, pick a random one
     if reminder_id == "affirmation":
@@ -84,5 +84,5 @@ def get_reminder_content(reminder_id):
         else:
             message = f"{message}\n\n\"(You have no affirmations in your library.)\""
 
-    return title, message, audio_cue, duration_sec
+    return title, message, audio_cue
 

@@ -7,7 +7,8 @@ It emits signals to the backend and receives data to populate itself.
 import sys
 import uuid # For generating unique mode IDs
 import os # For sound file paths
-import json # <-- FIX: Added missing json import
+import json
+import webbrowser # <-- NEW: For opening update URL
 from functools import partial # For connecting signals with arguments
 
 from PyQt6.QtWidgets import (
@@ -17,27 +18,31 @@ from PyQt6.QtWidgets import (
     QCheckBox, QSpinBox, QComboBox, QGridLayout, QTextEdit,
     QInputDialog, QMessageBox
 )
+# Added QThread, pyqtSlot
 from PyQt6.QtCore import (Qt, QPoint, QTimer, QPropertyAnimation, QEasingCurve,
-                          QRect, QSize, pyqtSignal, QObject, QRectF, QUrl) # Added QUrl
+                          QRect, QSize, pyqtSignal, QObject, QRectF, QUrl, QThread, pyqtSlot) 
 # Import QPaintEvent for type hinting
 from PyQt6.QtGui import QColor, QPalette, QIcon, QPainter, QPen, QMouseEvent, QGuiApplication, QPaintEvent
 # Import new modules for sound and TTS
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtTextToSpeech import QTextToSpeech
 
+
 # We must import config from the backend
 try:
     # This assumes run.py has added 'backend' to the sys.path
     import config # type: ignore[import]
+    import labeller # type: ignore[import]
 except ImportError:
     # Fallback for testing
-    print("Warning: Could not import config. Running in standalone test mode.")
+    print("Warning: Could not import config/labeller. Running in standalone test mode.")
     import os
     # Fallback needs os module
     if 'os' not in locals() and 'os' not in globals():
         import os
     sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
     import config # type: ignore[import]
+    import labeller # type: ignore[import]
 
 
 # --- +++ Theme Manager +++ ---
@@ -50,28 +55,25 @@ class ThemeManager:
     def load_themes(self):
         try:
             with open(config.THEMES_FILE, 'r') as f:
-                theme_data = json.load(f) # <-- FIX: Pylance error, json was undefined
+                theme_data = json.load(f)
                 self.themes = theme_data.get("themes", [])
                 print(f"[ThemeManager] Loaded {len(self.themes)} themes.")
         except Exception as e:
             print(f"[ThemeManager] CRITICAL: Could not load themes.json: {e}")
-            self.themes = [] # Use empty list as fallback
+            self.themes = [] 
 
     def get_theme_by_id(self, theme_id):
         """Finds a theme in the list by its ID."""
         for theme in self.themes:
             if theme.get("id") == theme_id:
                 return theme
-        return None # Not found
+        return None 
 
     def get_active_theme_colors(self):
         """Gets the colors for the currently active theme in config."""
         active_id = config.settings.get("global_settings", {}).get("active_theme_id", "theme_obsidian_01")
         
-        # Special case: System theme
         if active_id == "system":
-            # TODO: Implement light/dark detection
-            # For now, return a basic light theme
             print("[ThemeManager] 'System' theme active (using fallback light).")
             return {
                 "background": "#F9FAFB", "surface": "#FFFFFF", "primary": "#3B82F6",
@@ -85,21 +87,19 @@ class ThemeManager:
             print(f"[ThemeManager] Applying theme: {theme.get('name')}")
             return theme.get("colors", {})
         
-        # Fallback if theme_id is invalid
         print(f"[ThemeManager] Warning: Active theme '{active_id}' not found. Falling back to Obsidian.")
         theme = self.get_theme_by_id("theme_obsidian_01")
         if theme:
             return theme.get("colors", {})
         
-        # Absolute fallback
-        return {"background": "#FFFFFF", "primary": "#000000"} # Basic fallback
+        return {"background": "#FFFFFF", "primary": "#000000"} 
 
 
 # --- Icons ---
-ICON_CLOCK = "⏰" # Using emoji again, ensure your system supports it
+ICON_CLOCK = "⏰" 
 ICON_SETTINGS = "⚙️"
 ICON_QUIT = "➡️"
-ICON_DELETE = "🗑️" # Trashcan icon
+ICON_DELETE = "🗑️" 
 
 
 # --- Custom Draggable Bubble ---
@@ -120,11 +120,10 @@ class DraggableBubble(QPushButton):
         """Store the start position of a potential drag."""
         if event.button() == Qt.MouseButton.LeftButton:
             self.drag_start_pos = event.globalPosition().toPoint()
-            # Find the parent QWidget (our main window) to move it
             window = self.window()
             if window:
                 self.window_start_pos = window.frameGeometry().topLeft()
-            self.is_dragging = False # Haven't moved yet
+            self.is_dragging = False 
             event.accept()
 
     def mouseMoveEvent(self, event: QMouseEvent): # type: ignore[override]
@@ -135,14 +134,12 @@ class DraggableBubble(QPushButton):
 
             delta = event.globalPosition().toPoint() - self.drag_start_pos
 
-            # Start dragging only if moved more than a few pixels
-            if delta.manhattanLength() > 3: # Use QApplication.startDragDistance() ideally
+            if delta.manhattanLength() > 3: 
                 self.is_dragging = True
 
             if self.is_dragging:
                 window = self.window()
                 if window:
-                    # Make sure window_start_pos is valid before adding delta
                     current_pos = self.window_start_pos
                     if current_pos is not None:
                         window.move(current_pos + delta)
@@ -155,10 +152,8 @@ class DraggableBubble(QPushButton):
         """
         if event.button() == Qt.MouseButton.LeftButton:
             if not self.is_dragging:
-                # This was a click, not a drag.
                 self.clicked.emit()
 
-            # Reset drag state
             self.drag_start_pos = None
             self.window_start_pos = None
             self.is_dragging = False
@@ -170,51 +165,43 @@ class PopupWidget(QWidget):
     """
     The 80% screen popup widget for reminders.
     """
-    closed = pyqtSignal() # Signal to tell the BubbleWidget we are done
+    closed = pyqtSignal() 
 
     def __init__(self, title, message, duration_sec, colors): # Pass in theme colors
         super().__init__()
 
         self.title_text = title
         self.message_text = message
-        self.duration_ms = max(100, duration_sec * 1000) # Ensure duration is at least 100ms
+        self.duration_ms = max(100, duration_sec * 1000) 
         self.elapsed_ms = 0
-        self.colors = colors # Store theme colors
+        self.colors = colors 
 
-        # --- Window Setup ---
         self.setWindowFlags(
             Qt.WindowType.FramelessWindowHint |
             Qt.WindowType.WindowStaysOnTopHint |
-            Qt.WindowType.Tool # Prevents it from showing in taskbar
+            Qt.WindowType.Tool 
         )
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
-        # --- Sizing (80% of screen) ---
         primary_screen = QGuiApplication.primaryScreen()
         if not primary_screen:
             print("[UI Error] Cannot get primary screen info for popup.")
-            # Don't try to show if we can't get screen info
-            # A timer will close this invisible widget after duration
             QTimer.singleShot(self.duration_ms, self.close_popup)
             return
 
-        screen_geo = primary_screen.availableGeometry() # Use availableGeometry
+        screen_geo = primary_screen.availableGeometry() 
 
-        # Use _popup_width to avoid name clash
         self._popup_width = int(screen_geo.width() * 0.8)
         self._popup_height = int(screen_geo.height() * 0.8)
         self.resize(self._popup_width, self._popup_height)
 
-        # Center it
         self.move(
             screen_geo.left() + int((screen_geo.width() - self._popup_width) / 2),
             screen_geo.top() + int((screen_geo.height() - self._popup_height) / 2)
         )
 
-        # --- Timer for the orange bar and auto-close ---
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_timer)
-        # Use a slightly longer interval for potentially better performance
         self.timer_interval = 100 # ms
         self.timer.start(self.timer_interval)
 
@@ -225,15 +212,13 @@ class PopupWidget(QWidget):
             self.timer.stop()
             self.close_popup()
         else:
-            self.update() # Trigger a repaint
+            self.update() 
 
     def paintEvent(self, event: QPaintEvent): # type: ignore[override]
         """Custom paint event to draw the dark background and timer."""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        # 1. Background (from theme)
-        # Use .get() with fallback colors
         bg_hex = self.colors.get("background", "#1F2937")
         bg_color = QColor(bg_hex)
         bg_color.setAlpha(int(255 * 0.95)) # 95% opacity
@@ -241,46 +226,38 @@ class PopupWidget(QWidget):
         painter.setPen(Qt.PenStyle.NoPen)
         painter.drawRoundedRect(QRectF(self.rect()), 16.0, 16.0)
 
-        # --- Calculate vertical positions dynamically ---
         content_margin = 40
-        available_height = self._popup_height - (2 * content_margin) - 10 # Reserve 10 for timer bar
+        available_height = self._popup_height - (2 * content_margin) - 10 
         title_height_estimate = 50
-        message_max_height = available_height - title_height_estimate - 20 # 20px spacing
+        message_max_height = available_height - title_height_estimate - 20 
 
-        # 2. Text (Title)
         painter.setPen(QColor(self.colors.get("text_primary", "#FFFFFF")))
         font = painter.font()
         font.setPointSize(24)
         font.setBold(True)
         painter.setFont(font)
 
-        # Center title vertically somewhat
         title_y_pos = content_margin + int(available_height * 0.2)
         title_rect = QRect(content_margin, title_y_pos, self._popup_width - (2*content_margin), title_height_estimate)
         painter.drawText(title_rect, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop, self.title_text)
 
-        # 3. Text (Message)
         font.setPointSize(16)
         font.setBold(False)
         painter.setFont(font)
         painter.setPen(QColor(self.colors.get("text_secondary", "#E5E7EB")))
 
-        # Center message below title
         msg_y_pos = title_y_pos + title_height_estimate + 20
         msg_rect = QRect(content_margin, msg_y_pos, self._popup_width - (2*content_margin), message_max_height)
 
-        # Use Qt.TextFlag.TextWordWrap for word wrapping
         painter.drawText(QRectF(msg_rect),
-                         int(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop | Qt.TextFlag.TextWordWrap), # Combine flags as int
+                         int(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop | Qt.TextFlag.TextWordWrap), 
                          self.message_text)
 
-        # 4. Timer Bar (from theme)
         if self.duration_ms > 0:
             progress = self.elapsed_ms / self.duration_ms
-            bar_width = self._popup_width * (1.0 - progress) # Bar shrinks from right to left
+            bar_width = self._popup_width * (1.0 - progress) 
 
             painter.setBrush(QColor(self.colors.get("primary", "#F97316")))
-            # Draw from bottom-left, full width initially, shrinking
             painter.drawRect(0, self._popup_height - 10, int(bar_width), 10)
 
     def close_popup(self):
@@ -288,21 +265,51 @@ class PopupWidget(QWidget):
         self.close()
 
 
+# --- NEW: Worker thread for scanning apps ---
+class ScanWorker(QObject):
+    """
+    Runs the 'get_unique_processes' scan in a separate thread.
+    """
+    # Signal: finished(list_of_new_apps)
+    finished = pyqtSignal(list)
+
+    def __init__(self):
+        super().__init__()
+
+    @pyqtSlot()
+    def run(self):
+        """This function is executed in the new thread."""
+        try:
+            print("[ScanWorker] Starting scan...")
+            existing_apps = labeller.load_existing_labels()
+            all_running_apps = labeller.get_unique_processes()
+            
+            # Find the difference
+            new_apps = all_running_apps.difference(existing_apps)
+            
+            print(f"[ScanWorker] Scan finished. Found {len(new_apps)} new apps.")
+            self.finished.emit(sorted(list(new_apps)))
+        except Exception as e:
+            print(f"[ScanWorker] Error during scan: {e}")
+            self.finished.emit([]) # Emit empty list on error
+
+
 # --- MERGED Settings Popup Widget ---
 class SettingsPopup(QWidget):
-    # Signal to tell BubbleWidget to refresh its mode list and theme
     settings_changed_signal = pyqtSignal()
+    startup_setting_changed_signal = pyqtSignal(bool) 
 
-    def __init__(self, theme_manager, parent=None): # Accept theme manager
-        super().__init__(parent) # Pass parent
+    def __init__(self, theme_manager, parent=None): 
+        super().__init__(parent) 
         
         self.theme_manager = theme_manager
-        self.colors = self.theme_manager.get_active_theme_colors() # Get current colors
+        self.colors = self.theme_manager.get_active_theme_colors() 
+        self.scan_thread: QThread | None = None # Thread for app scanner
+        self.scan_worker: ScanWorker | None = None # Worker for app scanner
         
         self.setWindowTitle("PulseBreak Settings")
         self.setMinimumSize(800, 600)
 
-        # --- Popup Window Flags ---
         self.setWindowFlags(
             Qt.WindowType.FramelessWindowHint |
             Qt.WindowType.Tool |
@@ -310,11 +317,9 @@ class SettingsPopup(QWidget):
         )
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
-        # --- Main Frame (Visible Background) ---
         self.main_frame = QFrame(self)
         self.main_frame.setObjectName("mainFrame")
         
-        # Add shadow effect
         shadow = QGraphicsDropShadowEffect(self)
         shadow.setBlurRadius(15); shadow.setColor(QColor(0, 0, 0, 60)); shadow.setOffset(0, 4)
         self.main_frame.setGraphicsEffect(shadow)
@@ -325,7 +330,6 @@ class SettingsPopup(QWidget):
         self.main_layout = QHBoxLayout(self.main_frame); self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
 
-        # --- Close Button ---
         self.close_button = QPushButton("✕")
         self.close_button.setFixedSize(24, 24)
         self.close_button.clicked.connect(self.close)
@@ -334,11 +338,9 @@ class SettingsPopup(QWidget):
         top_bar_layout.addWidget(self.close_button)
         top_bar_layout.setContentsMargins(0, 5, 5, 0)
 
-        # --- Container for Sidebar + Content ---
         container_widget = QWidget(); container_layout = QHBoxLayout(container_widget)
         container_layout.setSpacing(0); container_layout.setContentsMargins(0, 0, 0, 0)
 
-        # --- 1. Navigation Sidebar ---
         self.nav_widget = QWidget(); self.nav_widget.setObjectName("sidebar")
         self.nav_widget.setFixedWidth(200)
         self.nav_layout = QVBoxLayout(self.nav_widget)
@@ -354,18 +356,15 @@ class SettingsPopup(QWidget):
         self.nav_list.addItem("About")
         self.nav_layout.addWidget(self.nav_list)
 
-        # --- 2. Content Area (Stacked Widget) ---
         self.content_stack = QStackedWidget()
         
-        # Create pages using helper methods
         self.page_general = self._create_general_page()
         self.page_modes, self.modes_layout_container = self._create_modes_page_structure()
-        self.page_apps = self._create_work_apps_page()
+        self.page_apps = self._create_work_apps_page() # <-- MODIFIED
         self.page_affirmations = self._create_affirmations_page()
         self.page_update = self._create_update_page() # <-- NEW
         self.page_about = self._create_about_page()
 
-        # Add pages to stack
         self.content_stack.addWidget(self.page_general)
         self.content_stack.addWidget(self.page_modes)
         self.content_stack.addWidget(self.page_apps)
@@ -373,10 +372,8 @@ class SettingsPopup(QWidget):
         self.content_stack.addWidget(self.page_update) # <-- NEW
         self.content_stack.addWidget(self.page_about)
 
-        # Populate the initial modes page content
         self._build_mode_cards()
 
-        # --- Assemble Layout ---
         container_layout.addWidget(self.nav_widget)
         container_layout.addWidget(self.content_stack)
         main_content_layout = QVBoxLayout()
@@ -384,11 +381,10 @@ class SettingsPopup(QWidget):
         main_content_layout.addWidget(container_widget)
         self.main_layout.addLayout(main_content_layout)
 
-        # --- Connect Signals ---
         self.nav_list.currentRowChanged.connect(self.content_stack.setCurrentIndex)
-        self.nav_list.setCurrentRow(0) # Start on "General"
+        self.nav_list.setCurrentRow(0) 
         
-        self.apply_theme() # Apply theme colors
+        self.apply_theme() 
         self.center_window()
 
     def center_window(self):
@@ -411,26 +407,24 @@ class SettingsPopup(QWidget):
         page_layout.setContentsMargins(10, 10, 10, 10)
 
         title_label = QLabel(title)
-        title_label.setObjectName("pageTitle") # Use object name for styling
+        title_label.setObjectName("pageTitle") 
         page_layout.addWidget(title_label)
 
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
-        scroll.setStyleSheet("QScrollArea { background-color: transparent; }") # Match background
+        scroll.setStyleSheet("QScrollArea { background-color: transparent; }") 
 
         scroll_content = QWidget()
         scroll_content.setStyleSheet("background-color: transparent;")
         scroll.setWidget(scroll_content)
 
-        # This layout will hold the actual content (rows, cards, etc.)
         content_layout = QVBoxLayout(scroll_content)
         content_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         content_layout.setSpacing(10)
 
         page_layout.addWidget(scroll)
 
-        # Return the page AND the layout where content should be added
         return page, content_layout
 
     # --- Page Creation Functions (Minimal Styling) ---
@@ -438,17 +432,14 @@ class SettingsPopup(QWidget):
         page, layout = self._create_page_container("General Settings")
         g_settings = config.settings.get("global_settings", {})
         
-        # Run on Startup
         layout.addWidget(self._create_setting_row(
             "Run on Startup", "Auto start when computer turns on.",
             QCheckBox(), g_settings.get("run_on_startup", False)))
             
-        # Theme Selector
         theme_combo = QComboBox()
-        theme_combo.setObjectName("theme_widget") # Special object name
+        theme_combo.setObjectName("theme_widget") 
         theme_combo.addItems(["System"] + [t['name'] for t in self.theme_manager.themes])
         
-        # Find the name of the active theme
         active_id = g_settings.get("active_theme_id", "system")
         active_theme = self.theme_manager.get_theme_by_id(active_id)
         active_name = "System"
@@ -456,16 +447,15 @@ class SettingsPopup(QWidget):
             active_name = active_theme.get("name", "System")
         theme_combo.setCurrentText(active_name)
         
-        theme_combo.currentTextChanged.connect(self.save_theme_setting) # Special save function
+        theme_combo.currentTextChanged.connect(self.save_theme_setting) 
         layout.addWidget(self._create_setting_row(
             "Theme", "Choose the app's color theme.",
-            theme_combo, None)) # Value set manually
+            theme_combo, None)) 
             
-        # AFK Threshold
         afk_spin = QSpinBox(); afk_spin.setRange(30, 3600); afk_spin.setSuffix(" seconds")
         afk_value = int(g_settings.get("afk_threshold_sec", 300))
         layout.addWidget(self._create_setting_row(
-            "AFK Threshold", "Time of inactivity before pausing.",
+            "AFW(away from work) Threshold", "Time away from work apps before pausing.",
             afk_spin, afk_value))
             
         layout.addStretch()
@@ -475,28 +465,25 @@ class SettingsPopup(QWidget):
         """Creates the static structure of the modes page (title, scroll, add button)."""
         page, content_layout = self._create_page_container("Manage Modes")
 
-        # Add "Add New Mode" button
-        self.add_mode_button = QPushButton(" + Add New Mode") # Store ref
-        self.add_mode_button.setObjectName("add_mode_button") # Set object name for styling
+        self.add_mode_button = QPushButton(" + Add New Mode") 
+        self.add_mode_button.setObjectName("add_mode_button") 
         self.add_mode_button.clicked.connect(self.add_new_mode)
-        content_layout.insertWidget(0, self.add_mode_button) # Insert at the top
+        content_layout.insertWidget(0, self.add_mode_button) 
 
-        # Keep a reference to the layout where mode cards will go
         self.modes_layout_container = content_layout
-        return page, content_layout # Return both page and layout ref
+        return page, content_layout 
 
     def _build_mode_cards(self):
         """Builds and adds the mode card widgets to the modes page layout."""
-        # Clear existing mode widgets first (excluding the Add button and stretch)
         for i in reversed(range(self.modes_layout_container.count())):
             item = self.modes_layout_container.itemAt(i)
-            # FIX: Check item and item.widget()
+            # FIX: Pylance error
             if item:
-                widget = item.widget() # Get the widget from the item
+                widget = item.widget() 
                 if widget and not isinstance(widget, QPushButton):
                     widget.deleteLater()
                 elif item.spacerItem():
-                    pass
+                    pass 
         
         modes = config.settings.get("modes", [])
         self.mode_widgets = {} 
@@ -510,7 +497,6 @@ class SettingsPopup(QWidget):
             mode_widget.setFrameShape(QFrame.Shape.StyledPanel)
             mode_layout = QGridLayout(mode_widget)
 
-            # --- Mode Name and Delete Button ---
             name_layout = QHBoxLayout()
             mode_name_label = QLabel(mode.get("name", "Unnamed Mode"))
             mode_name_label.setObjectName("modeCardTitle")
@@ -523,9 +509,8 @@ class SettingsPopup(QWidget):
             delete_button.clicked.connect(partial(self.delete_mode, mode_id))
             name_layout.addWidget(delete_button)
 
-            mode_layout.addLayout(name_layout, 0, 0, 1, 5) # Span 5 columns
+            mode_layout.addLayout(name_layout, 0, 0, 1, 5) 
 
-            # Reminder Headers (as QLabels)
             headers = ["Reminder", "Enabled", "Interval (min)", "Delivery", "Duration (sec)"]
             for col, text in enumerate(headers):
                 header_label = QLabel(text)
@@ -545,7 +530,6 @@ class SettingsPopup(QWidget):
                     delivery_combo = QComboBox(); delivery_combo.addItems(["popup", "audio"])
                     duration_spin = QSpinBox(); duration_spin.setRange(0, 300); duration_spin.setSuffix(" sec")
                     
-                    # --- FIX: CONNECT WIDGETS TO SAVE FUNCTION ---
                     self.connect_mode_widgets(mode_id, toggle, interval_spin, delivery_combo, duration_spin, r_id)
 
                     mode_layout.addWidget(QLabel(r_name), row, 0)
@@ -564,17 +548,137 @@ class SettingsPopup(QWidget):
             self.modes_layout_container.insertWidget(stretch_index, mode_widget)
             self.mode_widgets[mode_id] = mode_widget 
 
-
+    # --- REBUILT: Work Apps Page ---
     def _create_work_apps_page(self):
         page, layout = self._create_page_container("Work Applications")
-        layout.addWidget(QLabel("Auto-synced from `labeller.json`."))
-        app_list_widget = QListWidget()
-        work_apps = config.settings.get("work_apps", [])
-        if work_apps: app_list_widget.addItems(work_apps)
-        else: app_list_widget.addItem("No work apps labeled. Run labeller.py!")
-        layout.addWidget(app_list_widget)
+
+        # 1. Scan Button
+        self.scan_button = QPushButton("Scan for Running Apps")
+        self.scan_button.setObjectName("saveButton") # Use save button style
+        self.scan_button.clicked.connect(self.start_app_scan)
+        layout.addWidget(self.scan_button)
+        
+        self.scan_status_label = QLabel("Click the button to find new apps not in your list.  \nAfter adding new apps, Please restart PulseBreak to apply changes.")
+        self.scan_status_label.setObjectName("settingDesc") # Use description style
+        layout.addWidget(self.scan_status_label)
+        
+        # 2. New Apps List
+        new_apps_label = QLabel("New Apps Found (click to add):")
+        new_apps_label.setObjectName("settingName") # Use setting name style
+        layout.addWidget(new_apps_label)
+        
+        self.new_apps_list = QListWidget()
+        self.new_apps_list.itemClicked.connect(self.add_app_to_list) # Click to add
+        layout.addWidget(self.new_apps_list)
+
+        # 3. Current Apps List
+        current_apps_label = QLabel("Current Work Apps:")
+        current_apps_label.setObjectName("settingName") # Use setting name style
+        layout.addWidget(current_apps_label)
+        
+        self.current_apps_list = QListWidget()
+        self.current_apps_list.itemClicked.connect(self.remove_app_from_list) 
+        self.refresh_work_apps_list() # Load initial list
+        layout.addWidget(self.current_apps_list)
+
         layout.addStretch()
         return page
+        
+    def refresh_work_apps_list(self):
+        """Reloads the list of current work apps from the JSON file."""
+        if not hasattr(self, 'current_apps_list'): return # Not built yet
+        self.current_apps_list.clear()
+        work_apps = labeller.load_existing_labels()
+        if work_apps:
+            self.current_apps_list.addItems(sorted(list(work_apps)))
+        else:
+            self.current_apps_list.addItem("No work apps labeled yet.")
+
+    @pyqtSlot()
+    def start_app_scan(self):
+        """Starts the app scan in a background thread."""
+        if self.scan_thread and self.scan_thread.isRunning():
+            print("[UI] Scan already in progress.")
+            return
+
+        print("[UI] Starting app scan thread...")
+        self.scan_button.setDisabled(True)
+        self.scan_status_label.setText("Scanning... (this may take a few seconds)")
+        self.new_apps_list.clear()
+
+        self.scan_worker = ScanWorker()
+        self.scan_thread = QThread()
+        self.scan_worker.moveToThread(self.scan_thread)
+        
+        self.scan_worker.finished.connect(self.on_scan_finished)
+        self.scan_thread.started.connect(self.scan_worker.run)
+        
+        self.scan_thread.start()
+
+    @pyqtSlot(list)
+    def on_scan_finished(self, new_apps_list):
+        """SLOT: Called when the ScanWorker thread is done."""
+        print(f"[UI] Scan finished. Found {len(new_apps_list)} new apps.")
+        self.scan_status_label.setText(f"Scan complete. Found {len(new_apps_list)} new apps. Click an app to add it. \nAfter adding new apps, Please restart PulseBreak to apply changes.")
+        self.scan_button.setDisabled(False)
+        
+        if new_apps_list:
+            self.new_apps_list.addItems(new_apps_list)
+        else:
+            self.new_apps_list.addItem("No new apps found!")
+
+        # Clean up thread
+        if self.scan_thread:
+            self.scan_thread.quit()
+            self.scan_thread.wait()
+            
+    def add_app_to_list(self, item):
+        """SLOT: Called when user clicks an app in the 'New Apps' list."""
+        app_name = item.text()
+        print(f"[UI] Adding '{app_name}' to work apps...")
+        
+        # 1. Load existing
+        current_apps_set = labeller.load_existing_labels()
+        # 2. Add new one
+        current_apps_set.add(app_name)
+        # 3. Save back to file
+        labeller.save_labels(current_apps_set)
+        
+        # 4. Refresh UI
+        self.new_apps_list.takeItem(self.new_apps_list.row(item)) # Remove from new list
+        self.refresh_work_apps_list() # Refresh current list
+        
+        # 5. Notify backend (force reload of config)
+        self.settings_changed_signal.emit()
+
+    def remove_app_from_list(self, item):
+        """SLOT: Called when user clicks an app in the 'Current Apps' list."""
+        app_name = item.text()
+        if app_name == "No work apps labeled yet.":
+            return # Do nothing on this placeholder
+
+        reply = QMessageBox.question(self, "Remove App",
+                                     f"Are you sure you want to remove '{app_name}' from your work apps list?",
+                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                                     QMessageBox.StandardButton.No)
+
+        if reply == QMessageBox.StandardButton.Yes:
+            print(f"[UI] Removing '{app_name}' from work apps...")
+            
+            # 1. Load existing
+            current_apps_set = labeller.load_existing_labels()
+            # 2. Remove the app
+            if app_name in current_apps_set:
+                current_apps_set.remove(app_name)
+            # 3. Save back to file
+            labeller.save_labels(current_apps_set)
+            
+            # 4. Refresh UI
+            self.refresh_work_apps_list() # Refresh current list
+            
+            # 5. Notify backend (force reload of config)
+            self.settings_changed_signal.emit()
+    # --- END REBUILT PAGE ---
 
     def _create_affirmations_page(self):
         page, layout = self._create_page_container("Affirmation Library")
@@ -593,33 +697,39 @@ class SettingsPopup(QWidget):
         layout.addStretch()
         return page
 
-    # --- NEW: Update Page ---
+    # --- REBUILT: Update Page ---
     def _create_update_page(self):
         page, layout = self._create_page_container("Check for Updates")
         
-        check_button = QPushButton("Check for Updates")
+        check_button = QPushButton("Check for Updates on GitHub")
         check_button.setObjectName("saveButton") # Re-use save button style
         check_button.clicked.connect(self.check_for_updates)
         layout.addWidget(check_button, alignment=Qt.AlignmentFlag.AlignLeft)
         
         self.update_status_label = QLabel("Click the button to check for new versions.")
+        self.update_status_label.setObjectName("settingDesc")
         layout.addWidget(self.update_status_label)
 
         layout.addStretch()
         return page
         
     def check_for_updates(self):
-        # Placeholder function
-        self.update_status_label.setText("Checking... (This is a placeholder)")
-        # Simulate a check
-        QTimer.singleShot(1500, lambda: self.update_status_label.setText("You are running the latest version!"))
-    # --- END NEW ---
+        """Opens the project's GitHub page in a browser."""
+        # ---!!! Nymo, change this URL to your repo !!! ---
+        YOUR_GITHUB_URL = "https://github.com/successjoseph/PulseBreak"
+        
+        self.update_status_label.setText(f"Opening {YOUR_GITHUB_URL}...")
+        try:
+            webbrowser.open(YOUR_GITHUB_URL)
+        except Exception as e:
+            self.update_status_label.setText(f"Could not open browser: {e}")
+    # --- END REBUILT PAGE ---
 
     def _create_about_page(self):
         page, layout = self._create_page_container("About PulseBreak")
         version = config.settings.get("version", "0.0.0")
         layout.addWidget(QLabel(f"PulseBreak v{version}"))
-        layout.addWidget(QLabel("A smart break and affirmation system."))
+        layout.addWidget(QLabel("PulseBreak is a cross-platform desktop application designed to improve health, focus, and accountability. \nIt intelligently monitors user-selected work applications to provide context-aware reminders. \nPulseBreak has a set of Customizable User Modes (e.g., At Work, Intense Focus, e.t.c), each with its own unique set of reminders and actions. \nPulseBreak's purpose is to ensure health and productivity are balanced.."))
         sys_info = config.settings.get("system_info", {})
         info_text = ("System Info:\n"
                      f"- OS: {sys_info.get('os')} {sys_info.get('os_release')}\n"
@@ -780,7 +890,7 @@ class SettingsPopup(QWidget):
             if needs_backend_update:
                 bubble_parent = self.parent()
                 if isinstance(bubble_parent, BubbleWidget):
-                    print("[UI] Notifying backend about AFK threshold change.")
+                    print("[UI] Notifying backend about AFW threshold change.")
                     current_active_mode = config.settings.get("active_mode_id")
                     if current_active_mode:
                         bubble_parent.mode_changed_signal.emit(current_active_mode)
@@ -889,6 +999,22 @@ class SettingsPopup(QWidget):
             #card QLabel#modeCardTitle {{ font-size: 14px; font-weight: bold; color: {c.get('text_primary', '#000')}; }}
             #card QLabel#modeCardHeader {{ color: {c.get('text_secondary', '#6B7280')}; font-size: 11px; font-weight: bold; }}
 
+            /* --- ADD THIS NEW BLOCK --- */
+            QCheckBox::indicator {{
+                width: 16px; height: 16px;
+                border: 1px solid {c.get('border', '#D1D5DB')};
+                border-radius: 4px;
+                background-color: {c.get('background', '#FFF')};
+            }}
+            QCheckBox::indicator:hover {{
+                border-color: {c.get('primary', '#3B82F6')};
+            }}
+            QCheckBox::indicator:checked {{
+                background-color: {c.get('primary', '#3B82F6')};
+                border-color: {c.get('primary', '#3B82F6')};
+            }}
+            /* --- END ADD BLOCK --- */
+
             QCheckBox, QSpinBox, QComboBox, QLineEdit, QTextEdit {{
                 color: {c.get('text_primary', '#000')};
                 background-color: {c.get('background', '#FFF')};
@@ -929,19 +1055,6 @@ class BubbleWidget(QWidget):
     def __init__(self, app_instance=None):
         super().__init__()
 
-# ... inside BubbleWidget.__init__ ...
-        self.player.setAudioOutput(self._audio_output)
-        self.tts = QTextToSpeech()
-        
-        # --- NEW: TTS Queue ---
-        self.tts_queue = []
-        self.is_speaking = False
-        # Connect the signal to know when speaking is done
-        self.tts.stateChanged.connect(self.on_tts_finished)
-        # --- END NEW ---
-
-        # --- Window Setup ---
-
         self.app = app_instance
         self.settings_popup: SettingsPopup | None = None 
         
@@ -951,9 +1064,16 @@ class BubbleWidget(QWidget):
 
         # --- NEW: Sound and TTS Engines ---
         self.player = QMediaPlayer()
-        self._audio_output = QAudioOutput()
-        self.player.setAudioOutput(self._audio_output)
+        self._audio_output = QAudioOutput() # REMOVED - This was causing the crash
+        self.player.setAudioOutput(self._audio_output) # REMOVED
         self.tts = QTextToSpeech()
+        
+        # --- NEW: TTS Queue ---
+        self.tts_queue = []
+        self.is_speaking = False
+        # Connect the signal to know when speaking is done
+        self.tts.stateChanged.connect(self.on_tts_finished)
+        # --- END NEW ---
 
         # --- Window Setup ---
         self.setWindowFlags(
@@ -1066,6 +1186,8 @@ class BubbleWidget(QWidget):
             self.settings_popup = SettingsPopup(theme_manager=self.theme_manager, parent=self)
             # Connect the signal to refresh bubble
             self.settings_popup.settings_changed_signal.connect(self.on_settings_changed)
+            # --- NEW: Connect startup signal from settings to bubble ---
+            self.settings_popup.startup_setting_changed_signal.connect(self.startup_setting_changed_signal.emit)
             self.settings_popup.show()
 
     def on_settings_changed(self):
@@ -1203,10 +1325,6 @@ class BubbleWidget(QWidget):
         print(f"[UI] Adding to TTS queue: {full_text}")
         self.tts_queue.append(full_text)
         self.process_tts_queue() # Try to process the queue
-        try:
-            self.tts.say(full_text)
-        except Exception as e:
-            print(f"[UI Error] Could not speak text: {e}")
 
     def process_tts_queue(self):
         """

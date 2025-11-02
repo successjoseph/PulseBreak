@@ -6,19 +6,27 @@ import getpass
 from datetime import datetime
 
 # --- +++ NEW: Path Configuration +++ ---
-# Get the absolute path to the directory where run.py is (one level up from this file)
-# This makes all paths reliable whether running from .py or .exe
-# __file__ is config.py -> dirname is backend/ -> dirname is PulseBreak/
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(ROOT_DIR, 'data')
+def get_app_root():
+    """Gets the correct root path, whether running as .py or bundled .exe"""
+    if getattr(sys, 'frozen', False):
+        # We are running in a bundled .exe (cx_Freeze or PyInstaller)
+        # sys.executable is the path to the .exe
+        return os.path.dirname(sys.executable)
+    # We are running as a .py script
+    # __file__ is config.py -> dirname is backend/ -> dirname is PulseBreak/
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Get the absolute path to the root directory
+APP_ROOT = get_app_root()
+DATA_DIR = os.path.join(APP_ROOT, 'data')
 SETTINGS_FILE = os.path.join(DATA_DIR, 'settings.json')
 LABELS_FILE = os.path.join(DATA_DIR, 'labeller.json')
-THEMES_FILE = os.path.join(DATA_DIR, 'themes.json') # New themes file
+THEMES_FILE = os.path.join(DATA_DIR, 'themes.json')
 # --- +++ END Path Configuration +++ ---
 
 
 # --- Constants ---
-VERSION = "0.3.0" # Version bump for theme support
+VERSION = "0.4.0" # Version bump for theme support
 
 # --- Default Settings Structure ---
 DEFAULT_SETTINGS = {
@@ -69,15 +77,13 @@ DEFAULT_SETTINGS = {
         }
     },
     
-    # --- Affirmation Library ---
+    # --- NEW: Affirmation Library ---
     "affirmation_library": [
         "I am focused and productive.",
         "I am calm and in control of my day.",
         "I value my health and well-being.",
         "Each break I take makes me more effective.",
-        "I am capable of solving complex problems.",
-        "I am creating positive habits.",
-        "My work makes a difference."
+        "I am creating positive habits."
     ],
 
     # --- Mode Definitions ---

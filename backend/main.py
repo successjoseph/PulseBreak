@@ -71,9 +71,13 @@ class PulseBreakEngine(QObject):
 
         reminder_settings = current_mode['reminders'].get(reminder_id, {})
         delivery_type = reminder_settings.get("delivery", "popup")
+        
+        # --- FIX: Get duration from the MODE's settings, not the library ---
+        duration_sec = reminder_settings.get("duration_sec", 10) # <-- Get duration from the active mode
+        # --- END FIX ---
 
         # --- Call the appropriate function ---
-        title, message, audio_cue, duration_sec = fn.get_reminder_content(reminder_id)
+        title, message, audio_cue = fn.get_reminder_content(reminder_id)
         
         # --- UPDATED DELIVERY LOGIC ---
         if delivery_type == "popup":

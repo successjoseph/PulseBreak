@@ -10,7 +10,7 @@
         "python_version": "3.11.0",
         "username": "pulsebreak_user"
     },
-    "active_mode_id": "mode_d0fba7",
+    "active_mode_id": "mode_0d27d9",
     "global_settings": {
         "run_on_startup": true,
         "enable_logging": false,
@@ -89,7 +89,7 @@
                 },
                 "affirmation": {
                     "enabled": true,
-                    "interval_min": 120,
+                    "interval_min": 119,
                     "delivery": "popup",
                     "duration_sec": 10
                 }
@@ -113,14 +113,14 @@
                     "duration_sec": 10
                 },
                 "stretch": {
-                    "enabled": false,
-                    "interval_min": 90,
-                    "delivery": "popup",
+                    "enabled": true,
+                    "interval_min": 120,
+                    "delivery": "audio",
                     "duration_sec": 10
                 },
                 "posture": {
                     "enabled": false,
-                    "interval_min": 15,
+                    "interval_min": 30,
                     "delivery": "audio",
                     "duration_sec": 10
                 },
@@ -140,13 +140,13 @@
                 "eye_break": {
                     "enabled": true,
                     "interval_min": 30,
-                    "delivery": "audio",
+                    "delivery": "popup",
                     "duration_sec": 10
                 },
                 "hydration": {
                     "enabled": true,
                     "interval_min": 60,
-                    "delivery": "audio",
+                    "delivery": "popup",
                     "duration_sec": 10
                 },
                 "stretch": {
@@ -158,7 +158,7 @@
                 "posture": {
                     "enabled": true,
                     "interval_min": 30,
-                    "delivery": "audio",
+                    "delivery": "popup",
                     "duration_sec": 10
                 },
                 "affirmation": {
@@ -244,52 +244,52 @@
             }
         },
         {
-            "id": "mode_d0fba7",
-            "name": "Testing",
+            "id": "mode_0d27d9",
+            "name": "tt",
             "is_default": false,
             "reminders": {
                 "eye_break": {
                     "enabled": false,
                     "interval_min": 1,
                     "delivery": "popup",
-                    "duration_sec": 10
+                    "duration_sec": 2
                 },
                 "hydration": {
                     "enabled": false,
                     "interval_min": 1,
                     "delivery": "popup",
-                    "duration_sec": 10
+                    "duration_sec": 2
                 },
                 "stretch": {
-                    "enabled": false,
+                    "enabled": true,
                     "interval_min": 1,
                     "delivery": "popup",
-                    "duration_sec": 10
+                    "duration_sec": 2
                 },
                 "posture": {
                     "enabled": false,
                     "interval_min": 1,
-                    "delivery": "audio",
-                    "duration_sec": 10
+                    "delivery": "popup",
+                    "duration_sec": 2
                 },
                 "affirmation": {
                     "enabled": false,
                     "interval_min": 1,
-                    "delivery": "audio",
-                    "duration_sec": 10
+                    "delivery": "popup",
+                    "duration_sec": 2
                 }
             }
         }
     ],
     "work_apps": [
+        "Code.exe",
+        "Notepad.exe",
+        "WindowsTerminal.exe",
         "adb.exe",
         "chrome.exe",
-        "Code.exe",
         "java.exe",
-        "Notepad.exe",
         "powershell.exe",
         "pycharm64.exe",
-        "python3.11.exe",
-        "WindowsTerminal.exe"
+        "python3.11.exe"
     ]
 }
