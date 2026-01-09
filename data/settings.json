@@ -10,9 +10,9 @@
         "python_version": "3.11.0",
         "username": "pulsebreak_user"
     },
-    "active_mode_id": "mode_0d27d9",
+    "active_mode_id": "mode_0b8f9f",
     "global_settings": {
-        "run_on_startup": true,
+        "run_on_startup": false,
         "enable_logging": false,
         "theme": "system",
         "afk_threshold_sec": 300,
@@ -114,13 +114,13 @@
                 },
                 "stretch": {
                     "enabled": true,
-                    "interval_min": 120,
+                    "interval_min": 100,
                     "delivery": "audio",
                     "duration_sec": 10
                 },
                 "posture": {
-                    "enabled": false,
-                    "interval_min": 30,
+                    "enabled": true,
+                    "interval_min": 20,
                     "delivery": "audio",
                     "duration_sec": 10
                 },
@@ -139,13 +139,13 @@
             "reminders": {
                 "eye_break": {
                     "enabled": true,
-                    "interval_min": 30,
+                    "interval_min": 20,
                     "delivery": "popup",
-                    "duration_sec": 10
+                    "duration_sec": 23
                 },
                 "hydration": {
                     "enabled": true,
-                    "interval_min": 60,
+                    "interval_min": 59,
                     "delivery": "popup",
                     "duration_sec": 10
                 },
@@ -157,7 +157,7 @@
                 },
                 "posture": {
                     "enabled": true,
-                    "interval_min": 30,
+                    "interval_min": 31,
                     "delivery": "popup",
                     "duration_sec": 10
                 },
@@ -215,28 +215,28 @@
                     "enabled": true,
                     "interval_min": 20,
                     "delivery": "popup",
-                    "duration_sec": 10
+                    "duration_sec": 23
                 },
                 "hydration": {
                     "enabled": true,
                     "interval_min": 60,
-                    "delivery": "popup",
+                    "delivery": "audio",
                     "duration_sec": 10
                 },
                 "stretch": {
                     "enabled": true,
                     "interval_min": 90,
-                    "delivery": "popup",
+                    "delivery": "audio",
                     "duration_sec": 10
                 },
                 "posture": {
                     "enabled": true,
                     "interval_min": 45,
                     "delivery": "audio",
-                    "duration_sec": 10
+                    "duration_sec": 8
                 },
                 "affirmation": {
-                    "enabled": true,
+                    "enabled": false,
                     "interval_min": 120,
                     "delivery": "popup",
                     "duration_sec": 10
@@ -244,39 +244,39 @@
             }
         },
         {
-            "id": "mode_0d27d9",
-            "name": "tt",
+            "id": "mode_e0c0e0",
+            "name": "Teaching",
             "is_default": false,
             "reminders": {
                 "eye_break": {
-                    "enabled": false,
-                    "interval_min": 1,
-                    "delivery": "popup",
-                    "duration_sec": 2
+                    "enabled": true,
+                    "interval_min": 20,
+                    "delivery": "audio",
+                    "duration_sec": 20
                 },
                 "hydration": {
-                    "enabled": false,
-                    "interval_min": 1,
-                    "delivery": "popup",
-                    "duration_sec": 2
+                    "enabled": true,
+                    "interval_min": 10,
+                    "delivery": "audio",
+                    "duration_sec": 10
                 },
                 "stretch": {
                     "enabled": true,
-                    "interval_min": 1,
-                    "delivery": "popup",
-                    "duration_sec": 2
+                    "interval_min": 90,
+                    "delivery": "audio",
+                    "duration_sec": 15
                 },
                 "posture": {
-                    "enabled": false,
-                    "interval_min": 1,
-                    "delivery": "popup",
-                    "duration_sec": 2
+                    "enabled": true,
+                    "interval_min": 10,
+                    "delivery": "audio",
+                    "duration_sec": 5
                 },
                 "affirmation": {
                     "enabled": false,
-                    "interval_min": 1,
+                    "interval_min": 120,
                     "delivery": "popup",
-                    "duration_sec": 2
+                    "duration_sec": 15
                 }
             }
         }

@@ -3,4 +3,7 @@
 **/__pycache__/
 **.spec
 **.iss
-**setup.py
+setup.py
+innosetup-6.5.4.exe
+.vscode/
+**.7z
