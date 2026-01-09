@@ -1,72 +1,57 @@
-PulseBreak ⏰
+PulseBreak
 
-A smart break and affirmation system to keep you healthy and focused during long sessions at the computer.
+<img width="818" height="600" alt="General settings" src="https://github.com/user-attachments/assets/4f78b3e1-c8e7-44fe-9706-d3e22ad738ec" />
+<img width="818" height="600" alt="manage modes" src="https://github.com/user-attachments/assets/758d9846-2582-4984-a066-a31e94589649" />
+<img width="818" height="600" alt="manage modes system theme" src="https://github.com/user-attachments/assets/b4af9c42-d434-46ef-9348-12639554a02d" />
+<img width="818" height="600" alt="general settings coffee house theme" src="https://github.com/user-attachments/assets/13409ab6-d410-4f1b-ac81-bdd331bad165" />
 
-(Add a GIF or screenshot here of the bubble, the tray, and the settings window)
 
-PulseBreak is a lightweight desktop app that monitors your "work applications" (like VS Code, Chrome, etc.) and provides timely reminders based on your current activity mode.
+A smart wellness and productivity companion for your desktop.
 
-It's designed to be lightweight, themeable, and highly customizable, giving you control over when and how you're reminded.
+PulseBreak is a lightweight, themeable app that monitors your "work applications" (like your code editor or browser) and provides context-aware reminders. It's designed to help you build healthy habits, stay focused, and maintain a positive mindset during long sessions at the computer.
+
+It uses an "Away From Work" (AFW) logic, pausing all reminders the moment you switch to a non-work app and seamlessly resuming when you're back.
 
 ✨ Core Features
 
-Smart App Detection: Reminders only activate when you're using a designated "work app."
+Floating Bubble UI: A minimal, draggable bubble gives you quick access to all your modes.
 
-Customizable Modes: Create different modes (e.g., "Intense Focus," "At Work") with their own unique reminder rules.
+Smart "Away From Work" (AFW) Detection: Reminders intelligently pause when you're not using your designated "work apps" and resume instantly when you're back.
 
-Queued Reminders: Popups and audio reminders will queue up, so you never miss one, even if they fire at the same time.
+Customizable Modes: Create different profiles for your work. The default "Intense Focus" mode uses subtle audio-only alerts, while "At Work" uses full-screen popups.
 
-Themeable UI: Customize the app's look and feel. Includes 7+ built-in themes like "Obsidian" and "Graphite."
+Full Theme Engine: Customize the app's entire look and feel. Comes with 7+ themes (like Obsidian, Graphite, and Zen Garden) and you can edit them via themes.json.
 
-Text-to-Speech: "Audio-only" modes will speak the reminder to you instead of showing a visual popup, keeping you in the flow.
+Popup & Audio Reminders: Get 80% screen-covering popups (with a timer bar) that queue up so you never miss one, or get subtle Text-to-Speech (TTS) reminders that speak to you.
 
-GUI-Based Labeller: Scan for new apps and add them to your "work apps" list directly from the settings menu.
+GUI App Labeller: No more editing JSON files. The "Work Apps" page in Settings lets you scan your running applications and add/remove new "work apps" with a single click.
 
-Auto-Save: All settings save instantly—no "Save" button needed.
+Add/Delete Modes: You can now create, customize, and delete modes directly from the settings panel.
 
-🧱 Tech Stack
+Auto-Save: All settings (general, modes, affirmations) save automatically the moment you change them.
 
-Frontend (UI): Python + PyQt6
+Update Checker: The "Update" page links directly to the project's GitHub Releases page.
 
-Backend (Engine): Python + APScheduler (for timers)
+⚙️ How to Install (from Release)
 
-App Detection: Python + psutil
+Go to the Releases Page.
 
-Sound: PyQt6.QtMultimedia
+Download the PulseBreak_Setup.exe from the latest release.
 
-Speech: PyQt6.QtTextToSpeech
+Run the installer. It will automatically install to your AppData folder and create shortcuts.
 
-Installer: cx_Freeze + Inno Setup
+🛠️ Tech Stack
 
-🚀 How to Use (for Development)
+Frontend (GUI): Python + PyQt6
 
-Clone the repository: git clone https://github.com/successjoseph/PulseBreak.git
+Backend (Logic): Python
 
-Install dependencies: pip install -r requirements.txt
+Scheduling: apscheduler
 
-Run the app: python run.py
+App Detection: psutil
 
-📂 How to Build the Installer
+Sound/TTS: PyQt6.QtMultimedia, PyQt6.QtTextToSpeech
 
-This project uses cx_Freeze to build the app folder and Inno Setup to create the final setup.exe.
-
-Build with cx_Freeze:
-
-python setup.py build
+Installer: PyInstaller
 
 
-This creates a build/PulseBreak folder containing PulseBreak.exe and all its files.
-
-Compile with Inno Setup:
-
-Download and install Inno Setup.
-
-Open setup_script.iss in the Inno Setup Compiler.
-
-Click Build -> Compile.
-
-Your final PulseBreak_Setup.exe will be in the Output folder.
-
-⬆️ Updates
-
-You can check for new versions by going to the Update tab in the app's settings, or by visiting the Releases page for this repo.
